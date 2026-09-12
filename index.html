@@ -1073,7 +1073,7 @@ body.archive-mode #archiveExportBtn, body.archive-mode #csvExportBtn, body.archi
     <div id="searchResults"></div>
     <button id="archiveExportBtn" type="button">📦 年度アーカイブを書き出す</button>
     <button id="csvExportBtn" type="button">📊 <span id="csvYearLabel">R8</span>年度 受注集計・教科メモをExcel書き出す</button>
-    <button id="driveSaveBtn" type="button">☁️ Google Driveに保存</button>
+    <button id="driveSaveBtn" type="button">📗 スプレッドシートに書き出す</button>
     <button id="driveConfigBtn" type="button">⚙️ Drive連携設定</button>
   </div>
 </div>
@@ -2170,7 +2170,7 @@ function buildWorkbookFiles(sheets){
 function strCell(v){ return {v, type:'s'}; }
 function numCell(v){ return {v, type:'n'}; }
 
-async function buildOrderSummaryWorkbookBlob(){
+async function buildOrderSummaryData(){
   const yearIdx = 3;
   const yearLabel = YEAR_LABELS[yearIdx] || 'R8';
 
@@ -2228,6 +2228,14 @@ async function buildOrderSummaryWorkbookBlob(){
     return null;
   }
 
+  return { yearLabel, summaryRows, memoRowsBySubject };
+}
+
+async function buildOrderSummaryWorkbookBlob(){
+  const data = await buildOrderSummaryData();
+  if(!data) return null;
+  const { yearLabel, summaryRows, memoRowsBySubject } = data;
+
   const sheets = [];
   sheets.push({
     name: sanitizeSheetName(`${yearLabel}年度受注集計`),
@@ -2262,16 +2270,7 @@ async function exportOrderSummaryWorkbook(){
 }
 document.getElementById('csvExportBtn').addEventListener('click', exportOrderSummaryWorkbook);
 
-// ---------------- Google Drive連携(Apps Script Web App経由) ----------------
-function blobToBase64(blob){
-  return new Promise((resolve, reject)=>{
-    const reader = new FileReader();
-    reader.onload = ()=> resolve(reader.result.split(',').pop());
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
-
+// ---------------- スプレッドシート連携(Apps Script Web App経由) ----------------
 async function getDriveConfig(){
   const cfg = await storeGet('driveConfig');
   return (cfg && cfg.url && cfg.token) ? cfg : null;
@@ -2305,7 +2304,7 @@ document.getElementById('driveConfigSaveBtn').addEventListener('click', async ()
   showToast('Drive連携設定を保存しました');
 });
 
-async function saveOrderSummaryToDrive(){
+async function syncOrderSummaryToSheet(){
   const cfg = await getDriveConfig();
   if(!cfg){
     showToast('先にDrive連携設定を行ってください');
@@ -2313,30 +2312,47 @@ async function saveOrderSummaryToDrive(){
     return;
   }
   showToast('集計を作成しています…');
-  const result = await buildOrderSummaryWorkbookBlob();
-  if(!result){
+  const data = await buildOrderSummaryData();
+  if(!data){
     showToast('対象データがありません');
     return;
   }
+  const { yearLabel, summaryRows, memoRowsBySubject } = data;
+  const sheets = [];
+  sheets.push({
+    name: sanitizeSheetName(`${yearLabel}年度受注集計`),
+    rows: [
+      ['学校名','教科','教材名','採択','学年','数量'],
+      ...summaryRows
+    ]
+  });
+  SUBJECTS.forEach(sub=>{
+    sheets.push({
+      name: sanitizeSheetName(`${sub}メモ`),
+      rows: [
+        ['学校名','日付','先生名','内容'],
+        ...memoRowsBySubject[sub]
+      ]
+    });
+  });
   try{
-    showToast('Driveへ送信しています…');
-    const dataBase64 = await blobToBase64(result.blob);
+    showToast('スプレッドシートへ送信しています…');
     const res = await fetch(cfg.url, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ token: cfg.token, filename: result.filename, dataBase64 })
+      body: JSON.stringify({ token: cfg.token, sheets })
     });
     const json = await res.json().catch(()=> null);
     if(json && json.ok){
-      showToast('Driveに保存しました');
+      showToast('スプレッドシートに書き出しました');
     } else {
-      showToast('Drive保存に失敗しました' + (json && json.error ? (': ' + json.error) : ''));
+      showToast('書き出しに失敗しました' + (json && json.error ? (': ' + json.error) : ''));
     }
   }catch(err){
-    showToast('Drive保存に失敗しました(通信エラー)');
+    showToast('書き出しに失敗しました(通信エラー)');
   }
 }
-document.getElementById('driveSaveBtn').addEventListener('click', saveOrderSummaryToDrive);
+document.getElementById('driveSaveBtn').addEventListener('click', syncOrderSummaryToSheet);
 
 // swipe
 let touchStartX = null, touchStartY = null, touching=false, touchInScrollable=false;
