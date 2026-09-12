@@ -1,0 +1,2442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>教材受注台帳（中学校・原本）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F1EEE2;
+  --paper-dark:#E7E1CE;
+  --ink:#26344B;
+  --ink-soft:#5B6473;
+  --rule:#B9AE8C;
+  --rule-soft:#D9D2B8;
+  --hanko:#B3312C;
+  --hanko-soft:#E3C7C2;
+  --forest:#3F6B4A;
+  --card:#FBF9F2;
+  --shadow: 0 2px 10px rgba(38,52,75,0.12);
+  --tab-1:#6B8F71;
+  --tab-2:#52708A;
+  --tab-3:#B8863B;
+  --tab-4:#7B5470;
+  --tab-5:#3F7D7A;
+  --tab-6:#B4623C;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;height:100%;overscroll-behavior:none;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Zen Kaku Gothic New',sans-serif;
+  font-size:15px;
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+  height:100dvh;
+  overflow:hidden;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(185,174,140,0.16) 28px);
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important; transition-duration:0.01ms !important;}
+}
+
+/* ---------- HEADER ---------- */
+#topbar{
+  flex:0 0 auto;
+  padding:10px 16px;
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  border-bottom:2px solid var(--ink);
+  background:var(--paper);
+  position:relative;
+  z-index:25;
+}
+#topbar .titles{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;min-width:0;flex:1 1 auto;}
+.topbar-actions{display:flex;align-items:center;flex:0 1 auto;min-width:0;}
+#contactInfo{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:2px;
+  min-width:0;
+  flex:0 1 auto;
+}
+.contact-input{
+  font-size:11px;
+  color:var(--ink-soft);
+  text-align:right;
+  line-height:1.4;
+  border:none;
+  border-bottom:1px dashed transparent;
+  background:transparent;
+  width:100%;
+  max-width:118px;
+  min-width:56px;
+  padding:1px 2px;
+  font-family:inherit;
+}
+#schoolName{
+  font-family:'Shippori Mincho',serif;
+  font-weight:700;
+  font-size:22px;
+  letter-spacing:0.02em;
+  border:none;
+  border-bottom:1.5px dashed transparent;
+  background:transparent;
+  color:var(--ink);
+  padding:2px 3px;
+  min-width:64px;
+  max-width:44vw;
+  font-family:'Shippori Mincho',serif;
+}
+#schoolName:focus{outline:none; border-bottom-color:var(--hanko); background:rgba(255,255,255,0.55);}
+#schoolName::placeholder{color:var(--ink-soft); opacity:0.6;}
+#pageKind{
+  font-family:'Shippori Mincho',serif;
+  font-size:17px;
+  color:var(--ink-soft);
+}
+.contact-input:focus{outline:none; border-bottom-color:var(--hanko); background:rgba(255,255,255,0.5);}
+.contact-input::placeholder{color:#B5AD98;}
+
+/* ---------- TAB RAIL (signature element) ---------- */
+#tabRail{
+  position:fixed;
+  top:0; right:0; bottom:0;
+  width:64px;
+  z-index:20;
+  overflow-y:auto;
+  overflow-x:visible;
+  scrollbar-width:none;
+  display:flex;
+  flex-direction:column;
+  padding-top:70px;
+  pointer-events:none;
+}
+#tabRail::-webkit-scrollbar{display:none;}
+.tab{
+  pointer-events:auto;
+  position:relative;
+  margin:1px 0 1px auto;
+  padding:7px 5px;
+  width:56px;
+  min-height:34px;
+  border-radius:6px 0 0 6px;
+  color:#fff;
+  font-family:'Zen Kaku Gothic New',sans-serif;
+  font-weight:700;
+  font-size:11px;
+  line-height:1.3;
+  letter-spacing:0.01em;
+  text-align:center;
+  white-space:normal;
+  word-break:keep-all;
+  overflow-wrap:anywhere;
+  box-shadow:-1px 2px 4px rgba(0,0,0,0.18);
+  transition:width 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.tab.active{
+  width:70px;
+  transform:translateX(-6px);
+  box-shadow:-2px 3px 8px rgba(0,0,0,0.28);
+  outline:2px solid var(--paper);
+  outline-offset:-4px;
+}
+.tab:focus-visible{outline:3px solid var(--hanko);}
+
+.tab-add{
+  pointer-events:auto;
+  margin:8px 0 16px auto;
+  width:56px;height:40px;
+  border-radius:6px 0 0 6px;
+  border:1.5px dashed var(--rule);
+  background:var(--paper-dark);
+  color:var(--ink-soft);
+  font-size:20px;
+  font-weight:700;
+  font-family:inherit;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  box-shadow:-1px 2px 4px rgba(0,0,0,0.1);
+}
+.tab-add:active{background:var(--rule-soft);}
+
+/* ---------- MAIN SCROLL AREA ---------- */
+#viewport{
+  flex:1 1 auto;
+  overflow:hidden;
+  position:relative;
+  margin-right:64px;
+}
+#pageTrack{
+  height:100%;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:14px 14px 90px 16px;
+}
+.fade-enter{animation:pageFade 0.22s ease;}
+@keyframes pageFade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* ---------- SECTION CARD ---------- */
+.section{
+  background:var(--card);
+  border:1px solid var(--rule-soft);
+  border-radius:10px;
+  padding:12px 14px 14px;
+  margin-bottom:14px;
+  box-shadow:var(--shadow);
+}
+.section h2{
+  font-family:'Shippori Mincho',serif;
+  font-size:15px;
+  margin:0 0 10px 0;
+  padding-bottom:6px;
+  border-bottom:1.5px solid var(--rule);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--ink);
+}
+.section h2 .eyebrow{
+  font-size:10px;
+  font-weight:700;
+  color:#fff;
+  background:var(--ink);
+  padding:2px 7px;
+  border-radius:3px;
+  font-family:'Zen Kaku Gothic New',sans-serif;
+  letter-spacing:0.05em;
+}
+.subhead{
+  font-size:12px;
+  color:var(--hanko);
+  font-weight:700;
+  margin:14px 0 6px;
+  padding-left:2px;
+  border-left:3px solid var(--hanko);
+  padding-left:6px;
+}
+
+/* ---------- SUBJECT ITEM ---------- */
+.item{
+  padding:9px 2px;
+  border-bottom:1px dashed var(--rule-soft);
+}
+.item:last-child{border-bottom:none;}
+.item-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:8px;
+  margin-bottom:4px;
+}
+.item-name{font-weight:700;font-size:14.5px;}
+.item-name.empty{color:var(--ink-soft);font-weight:500;font-style:italic;}
+.item-price{font-size:12.5px;color:var(--ink-soft);white-space:nowrap;font-variant-numeric:tabular-nums;}
+.chiprow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:3px 0;}
+.yearlabel-input{
+  font-size:10.5px;color:#fff;background:var(--ink-soft);
+  width:30px;flex:0 0 auto;font-weight:700;
+  border:none;border-radius:4px;
+  text-align:center;padding:6px 2px;
+  font-family:'Zen Kaku Gothic New',sans-serif;
+}
+.yearlabel-input:focus{outline:2px solid var(--hanko);}
+.chip{
+  position:relative;
+  padding:4px 11px;
+  font-size:13.5px;
+  border-radius:5px;
+  background:transparent;
+  border:1px solid transparent;
+  cursor:pointer;
+  font-family:'Zen Kaku Gothic New',sans-serif;
+  color:var(--ink);
+  user-select:none;
+  min-height:30px;
+  display:inline-flex;
+  align-items:center;
+}
+.chip:active{background:rgba(38,52,75,0.06);}
+.chip .ring{
+  position:absolute;
+  inset:-3px -7px;
+  border:2.5px solid var(--hanko);
+  border-radius:50% 44% 56% 48% / 58% 46% 62% 42%;
+  transform:rotate(-4deg);
+  opacity:0;
+  pointer-events:none;
+}
+.chip.on{color:var(--hanko);font-weight:700;}
+.chip.on .ring{opacity:1;}
+.item-fields{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;}
+.field-mini{display:flex;align-items:center;gap:4px;}
+.field-mini label{font-size:10.5px;color:var(--ink-soft);}
+.field-mini input{
+  border:1px solid var(--rule);
+  border-radius:5px;
+  background:#fff;
+  padding:5px 6px;
+  font-size:12.5px;
+  font-family:inherit;
+  color:var(--ink);
+  width:78px;
+}
+.field-mini input[type=number]{width:54px;}
+.datebox{position:relative; display:inline-flex; align-items:center;}
+.datebox .date-native{
+  position:absolute; inset:0; opacity:0; width:100%; height:100%;
+  cursor:pointer; z-index:2; font-size:16px; margin:0; padding:0; border:none;
+}
+.datebox .date-label{
+  pointer-events:none;
+  border:1px solid var(--rule);
+  border-radius:5px;
+  background:#fff;
+  padding:5px 10px;
+  font-size:12.5px;
+  color:var(--ink);
+  min-width:46px;
+  text-align:center;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+.datebox .date-label.empty{color:#B5AD98;}
+
+/* ---------- CLASS TABLE ---------- */
+.classgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+.classcell{
+  background:#fff;
+  border:1px solid var(--rule-soft);
+  border-radius:7px;
+  padding:5px 6px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:2px;
+  min-width:0;
+}
+.classcell .clabel{font-size:11px;color:var(--ink-soft);font-weight:700;}
+.classcell input{
+  width:40px;
+  border:none;
+  border-bottom:1.5px solid var(--rule);
+  background:transparent;
+  text-align:center;
+  font-size:15px;
+  font-weight:700;
+  color:var(--ink);
+  padding:2px 0;
+}
+.classtotal{margin-top:8px;font-size:12px;color:var(--ink-soft);text-align:right;}
+.classtotal b{color:var(--ink);font-size:14px;}
+
+/* ---------- CHECK ROW ---------- */
+.checkrow{display:flex;gap:10px;flex-wrap:wrap;}
+.checkbtn{
+  flex:1 1 0;
+  min-width:88px;
+  text-align:center;
+  padding:12px 6px;
+  border-radius:8px;
+  border:1.5px solid var(--rule);
+  background:#fff;
+  font-weight:700;
+  font-size:13px;
+  cursor:pointer;
+  color:var(--ink-soft);
+  transition:background 0.12s, color 0.12s, border-color 0.12s;
+}
+.checkbtn.on{background:var(--forest);border-color:var(--forest);color:#fff;}
+
+/* ---------- DYNAMIC LIST (return books / memo) ---------- */
+.dyn-row{
+  background:#fff;
+  border:1px solid var(--rule-soft);
+  border-radius:8px;
+  padding:9px 10px;
+  margin-bottom:8px;
+  position:relative;
+}
+.dyn-row .grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;}
+.dyn-row .visit-cols{display:grid;grid-template-columns:minmax(76px,88px) minmax(64px,84px) 1fr;gap:6px;align-items:start;}
+.dyn-row .visit-cols textarea{min-height:34px;}
+.dyn-row input, .dyn-row textarea{
+  width:100%;
+  border:none;
+  border-bottom:1.3px solid var(--rule-soft);
+  background:transparent;
+  font-family:inherit;
+  font-size:13px;
+  padding:4px 2px;
+  color:var(--ink);
+}
+.dyn-row textarea{resize:vertical;min-height:36px;border-bottom:none;background:#FAF8EF;border-radius:5px;padding:6px 8px;border:1px solid var(--rule-soft);}
+.dyn-row input::placeholder,.dyn-row textarea::placeholder{color:#B5AD98;}
+.delrow{
+  position:absolute; top:6px; right:6px;
+  width:22px;height:22px;border-radius:50%;
+  background:var(--paper-dark); color:var(--ink-soft);
+  border:none; font-size:13px; line-height:1; cursor:pointer;
+}
+.addbtn{
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:1.5px dashed var(--rule);
+  background:transparent;
+  color:var(--ink-soft);
+  font-weight:700;
+  font-size:13px;
+  cursor:pointer;
+  font-family:inherit;
+}
+.addbtn:active{background:var(--paper-dark);}
+.empty-hint{font-size:12px;color:var(--ink-soft);padding:6px 2px 10px;}
+
+/* ---------- MEMO PAGE ---------- */
+.memopage-hero{
+  font-family:'Shippori Mincho',serif;
+  font-size:20px;
+  margin:4px 0 14px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.memopage-hero .stamp{
+  display:inline-block;
+  border:2.5px solid var(--hanko);
+  color:var(--hanko);
+  border-radius:50% 44% 56% 48% / 58% 46% 62% 42%;
+  transform:rotate(-4deg);
+  padding:3px 10px;
+  font-size:13px;
+  font-weight:700;
+}
+
+/* ---------- BOTTOM NAV ---------- */
+#bottomnav{
+  position:fixed;
+  left:0; right:64px; bottom:0;
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+  background:linear-gradient(0deg, var(--paper) 60%, rgba(241,238,226,0));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  z-index:15;
+  pointer-events:none;
+}
+#bottomnav .navbtn{
+  pointer-events:auto;
+  background:var(--ink);
+  color:#fff;
+  border:none;
+  width:38px;height:38px;
+  border-radius:50%;
+  font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--shadow);
+  flex:0 0 auto;
+}
+#dots{
+  pointer-events:auto;
+  display:flex;
+  gap:5px;
+  background:var(--card);
+  border:1px solid var(--rule-soft);
+  border-radius:20px;
+  padding:6px 10px;
+  box-shadow:var(--shadow);
+  overflow-x:auto;
+  max-width:calc(100vw - 180px);
+}
+.dot{
+  flex:0 0 auto;
+  width:26px;height:26px;
+  border-radius:50%;
+  border:1.5px solid var(--rule);
+  background:#fff;
+  font-size:11px;
+  font-weight:700;
+  color:var(--ink-soft);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+}
+.dot.active{background:var(--hanko);border-color:var(--hanko);color:#fff;}
+.dot.memo{font-size:13px;}
+
+/* swipe hint arrows */
+.edgehint{
+  position:absolute; top:50%; transform:translateY(-50%);
+  color:var(--rule); font-size:22px; opacity:0.5; pointer-events:none;
+}
+.edgehint.left{left:2px;} .edgehint.right{right:2px;}
+
+/* ---------- SCHOOL SEARCH ---------- */
+#searchBtn{
+  flex:0 0 auto;
+  width:34px;height:34px;
+  border-radius:50%;
+  border:1.5px solid var(--rule);
+  background:var(--card);
+  color:var(--ink);
+  font-size:15px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  margin-left:8px;
+}
+#deleteSchoolBtn{
+  flex:0 0 auto;
+  width:34px;height:34px;
+  border-radius:50%;
+  border:1.5px solid var(--hanko-soft);
+  background:var(--card);
+  color:var(--hanko);
+  font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  margin-left:6px;
+}
+#deleteSchoolBtn:active{background:var(--hanko-soft);}
+#searchOverlay{
+  position:fixed; inset:0;
+  background:rgba(38,52,75,0.34);
+  z-index:40;
+  display:none;
+  padding:12vh 16px 0;
+}
+#searchOverlay.open{display:block;}
+#searchPanel{
+  background:var(--paper);
+  border-radius:12px;
+  max-width:440px;
+  margin:0 auto;
+  max-height:70vh;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 8px 30px rgba(0,0,0,0.3);
+  overflow:hidden;
+  border:1px solid var(--rule-soft);
+}
+#searchInputRow{
+  display:flex; align-items:center; gap:8px;
+  padding:12px;
+  border-bottom:1.5px solid var(--ink);
+}
+#searchInputRow input{
+  flex:1;
+  border:1px solid var(--rule);
+  border-radius:8px;
+  padding:9px 10px;
+  font-size:15px;
+  font-family:inherit;
+  background:#fff;
+  color:var(--ink);
+}
+#searchCloseBtn{
+  flex:0 0 auto;
+  background:none;border:none;
+  font-size:20px;color:var(--ink-soft);
+  cursor:pointer; padding:2px 4px;
+}
+#searchResults{overflow-y:auto;}
+.searchResultRow{
+  display:flex; align-items:center; gap:10px;
+  padding:11px 14px;
+  border-bottom:1px dashed var(--rule-soft);
+  cursor:pointer;
+}
+.searchResultRow:active{background:var(--paper-dark);}
+.searchResultRow .swatch{
+  width:12px;height:12px;border-radius:50%;flex:0 0 auto;
+}
+.searchResultRow .srname{font-weight:700;font-size:14px;flex:1;}
+.searchResultRow .srbadge{
+  font-size:10px;color:var(--forest);font-weight:700;
+  border:1px solid var(--forest);border-radius:4px;padding:1px 5px;
+}
+.searchEmpty{padding:16px;text-align:center;color:var(--ink-soft);font-size:13px;}
+
+/* ---------- CONFIRM MODAL ---------- */
+#confirmOverlay{
+  position:fixed; inset:0;
+  background:rgba(38,52,75,0.4);
+  z-index:60;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:0 24px;
+}
+#confirmOverlay.open{display:flex;}
+#confirmPanel{
+  background:var(--paper);
+  border-radius:14px;
+  max-width:340px;
+  width:100%;
+  padding:20px 18px 16px;
+  box-shadow:0 10px 34px rgba(0,0,0,0.32);
+  border:1px solid var(--rule-soft);
+}
+#confirmMessage{
+  font-size:14px;
+  line-height:1.6;
+  color:var(--ink);
+  white-space:pre-wrap;
+  margin-bottom:18px;
+}
+#confirmButtons{
+  display:flex;
+  gap:8px;
+}
+#confirmButtons button{
+  flex:1;
+  padding:11px 8px;
+  border-radius:8px;
+  font-size:13.5px;
+  font-weight:700;
+  font-family:inherit;
+  cursor:pointer;
+  border:1.5px solid var(--rule);
+  background:#fff;
+  color:var(--ink-soft);
+}
+#confirmOkBtn{
+  border-color:var(--hanko);
+  background:var(--hanko);
+  color:#fff;
+}
+#confirmOkBtn:active{opacity:0.85;}
+#confirmCancelBtn:active{background:var(--paper-dark);}
+
+/* ---------- TAB DATA BADGE ---------- */
+.tab{position:relative;}
+.tab .tabdot{
+  position:absolute; top:4px; left:5px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--forest);
+  border:1.2px solid rgba(255,255,255,0.85);
+  display:none;
+}
+.tab.has-data .tabdot{display:block;}
+
+/* ---------- DOT COMPLETION BADGE ---------- */
+.dot{position:relative;}
+.dot.has-data::after{
+  content:'';
+  position:absolute; bottom:-2px; right:-2px;
+  width:8px;height:8px;border-radius:50%;
+  background:var(--forest);
+  border:1.5px solid var(--card);
+}
+
+/* ---------- SAVE TOAST ---------- */
+#saveToast{
+  position:fixed;
+  left:50%; bottom:64px;
+  transform:translate(-50%, 14px);
+  background:var(--ink);
+  color:#fff;
+  padding:8px 16px;
+  border-radius:20px;
+  font-size:12.5px;
+  font-weight:700;
+  box-shadow:0 4px 14px rgba(0,0,0,0.25);
+  z-index:50;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.2s ease, transform 0.2s ease;
+  display:flex; align-items:center; gap:8px;
+  white-space:nowrap;
+}
+#saveToast.show{opacity:1; transform:translate(-50%, 0);}
+#saveToast .undoLink{
+  color:#F1EEE2; text-decoration:underline; font-weight:700;
+  cursor:pointer; pointer-events:auto;
+  padding:2px 2px;
+}
+#saveToast .tick{color:#8FCB9A;font-size:14px;}
+
+/* ---------- STEPPER ---------- */
+.stepper{
+  display:flex; align-items:center; gap:0;
+  border:1px solid var(--rule);
+  border-radius:6px;
+  overflow:hidden;
+  background:#fff;
+  flex:0 0 auto;
+}
+.stepper button{
+  width:22px;height:28px;
+  border:none;
+  background:var(--paper-dark);
+  color:var(--ink);
+  font-size:14px;
+  font-weight:700;
+  font-family:inherit;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex:0 0 auto;
+}
+.stepper button:active{background:var(--rule-soft);}
+.stepper input{
+  width:34px !important;
+  border:none !important;
+  text-align:center;
+  padding:5px 0 !important;
+  -moz-appearance:textfield;
+}
+.stepper input::-webkit-outer-spin-button,
+.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.classcell .stepper input{width:26px !important;font-size:13px;}
+
+
+/* ---------- LEDGER TABLE (Excel忠実再現・横スクロール) ---------- */
+.xlsection h2{margin-bottom:8px;}
+.xltable-wrap{
+  overflow-x:auto;
+  overflow-y:hidden;
+  border:1px solid var(--rule-soft);
+  border-radius:8px;
+  -webkit-overflow-scrolling:touch;
+}
+table.xltable{
+  border-collapse:separate;
+  border-spacing:0;
+  font-size:11.5px;
+  white-space:nowrap;
+}
+table.xltable th, table.xltable td{
+  border-right:1px solid var(--rule-soft);
+  border-bottom:1px solid var(--rule-soft);
+  padding:5px 6px;
+  vertical-align:middle;
+}
+table.xltable thead th{
+  position:sticky;
+  top:0;
+  z-index:4;
+  background:var(--paper-dark);
+  font-size:10px;
+  font-weight:700;
+  color:var(--ink-soft);
+  text-align:center;
+  padding:6px 4px;
+}
+table.xltable thead th.corner{
+  position:sticky;
+  left:0;
+  top:0;
+  z-index:6;
+  text-align:left;
+  min-width:118px;
+}
+table.xltable thead th.ycol{min-width:52px;}
+table.xltable thead th.ycol.hl{background:var(--rule-soft);}
+table.xltable thead th.shcol{min-width:96px;}
+.yearlabel-input{
+  width:100%;
+  border:none;
+  background:transparent;
+  text-align:center;
+  font-size:16px;
+  font-weight:700;
+  color:inherit;
+  font-family:inherit;
+  padding:4px 0;
+}
+table.xltable thead th.ycol.hl .yearlabel-input{color:var(--hanko);}
+td.itemcell{
+  position:sticky;
+  left:0;
+  z-index:2;
+  background:var(--card);
+  min-width:118px;
+  max-width:150px;
+  white-space:normal;
+  vertical-align:top;
+}
+.itemname{font-size:12px;font-weight:700;color:var(--ink);line-height:1.35;}
+.itemprice{font-size:10.5px;color:var(--ink-soft);margin-top:1px;}
+.itemprice .price-input{
+  width:64px;
+  border:1px solid var(--rule);
+  border-radius:4px;
+  background:#fff;
+  font-size:16px;
+  font-family:inherit;
+  color:var(--ink);
+  padding:3px 4px;
+  text-align:right;
+}
+.pubrow-mini{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;}
+.pubrow-mini .chip{padding:2px 7px;font-size:10.5px;min-height:20px;}
+td.gradecell{
+  text-align:center;
+  font-size:11px;
+  font-weight:700;
+  color:var(--ink-soft);
+  min-width:30px;
+}
+.gradecycle-btn{
+  width:100%;
+  border:1.3px dashed var(--rule);
+  border-radius:5px;
+  background:#fff;
+  color:var(--hanko);
+  font-size:11px;
+  font-weight:700;
+  font-family:inherit;
+  padding:4px 2px;
+  cursor:pointer;
+}
+.gradecycle-btn:active{background:var(--paper-dark);}
+td.qtycell-stack{padding:3px 4px 4px;}
+.qtybox{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  border:1px solid var(--rule);
+  border-radius:5px;
+  background:#fff;
+  overflow:hidden;
+}
+td.qtycell-stack .gradecycle-btn{
+  display:block;
+  width:100%;
+  border:none;
+  border-bottom:1px dashed var(--rule-soft);
+  background:var(--paper-dark);
+  color:var(--hanko);
+  padding:6px 1px;
+  font-size:10px;
+  font-weight:700;
+  font-family:inherit;
+  border-radius:0;
+  margin-bottom:0;
+  cursor:pointer;
+  min-height:26px;
+}
+td.qtycell-stack .xlqty{
+  display:block;
+  width:100%;
+  border:none;
+  border-radius:0;
+}
+td.qtycell{text-align:center;min-width:48px;}
+td.qtycell.hl{background:var(--rule-soft);}
+.xlqty{
+  width:48px;
+  border:1px solid var(--rule);
+  border-radius:4px;
+  background:#fff;
+  text-align:center;
+  font-size:16px;
+  font-family:inherit;
+  color:var(--ink);
+  padding:6px 1px;
+  -moz-appearance:textfield;
+}
+td.qtycell.hl .xlqty{color:#1E4FBF;font-weight:700;border-color:var(--rule);}
+.xlqty::-webkit-outer-spin-button,.xlqty::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.xlqty:focus{outline:2px solid var(--hanko);border-color:var(--hanko);}
+td.shunincell{
+  min-width:96px;
+  max-width:110px;
+  white-space:normal;
+  vertical-align:top;
+  background:#fff;
+}
+.shunin-name{
+  width:100%;
+  border:none;
+  border-bottom:1px dashed var(--rule-soft);
+  background:transparent;
+  font-size:16px;
+  font-family:inherit;
+  color:var(--ink);
+  padding:3px 1px 6px;
+}
+.shunin-name::placeholder{color:#C9C1A8;}
+.shunin-div{height:5px;}
+.shunin-teacher{display:flex;align-items:center;gap:4px;}
+.shunin-teacher .tlabel{font-size:9px;color:var(--hanko);font-weight:700;white-space:nowrap;}
+.teacher-count{
+  width:44px;
+  border:1px solid var(--rule);
+  border-radius:4px;
+  background:#FAF8EF;
+  text-align:center;
+  font-size:16px;
+  font-family:inherit;
+  color:var(--ink);
+  padding:3px 1px;
+  -moz-appearance:textfield;
+}
+.teacher-count::-webkit-outer-spin-button,.teacher-count::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.enrolgrid{display:grid;grid-template-columns:repeat(auto-fit, minmax(96px,1fr));gap:6px;}
+
+/* ---------- ARCHIVE (年度アーカイブ) ---------- */
+#archiveBanner{
+  display:none;
+  background:var(--hanko);
+  color:#fff;
+  font-size:12px;
+  font-weight:700;
+  text-align:center;
+  padding:7px 8px;
+  letter-spacing:0.02em;
+}
+body.archive-mode #archiveBanner{display:block;}
+#archiveExportBtn, #csvExportBtn, #driveSaveBtn, #driveConfigBtn{
+  display:block;
+  width:calc(100% - 24px);
+  margin:10px 12px 12px;
+  padding:11px;
+  border-radius:8px;
+  border:1.5px dashed var(--rule);
+  background:var(--paper-dark);
+  color:var(--ink);
+  font-weight:700;
+  font-size:13px;
+  cursor:pointer;
+  font-family:inherit;
+}
+#archiveOverlay{
+  position:fixed; inset:0;
+  background:rgba(38,52,75,0.4);
+  z-index:60;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:0 24px;
+}
+#archiveOverlay.open{display:flex;}
+#archivePanel{
+  background:var(--paper);
+  border-radius:14px;
+  max-width:340px;
+  width:100%;
+  padding:20px 18px 16px;
+  box-shadow:0 10px 34px rgba(0,0,0,0.32);
+  border:1px solid var(--rule-soft);
+}
+#archiveMessage{font-size:14px;line-height:1.6;color:var(--ink);margin-bottom:12px;}
+#archiveYearInput{
+  width:100%;
+  border:1px solid var(--rule);
+  border-radius:8px;
+  padding:9px 10px;
+  font-size:14px;
+  font-family:inherit;
+  background:#fff;
+  color:var(--ink);
+  margin-bottom:16px;
+}
+#archiveButtons{display:flex;gap:8px;}
+#archiveButtons button{
+  flex:1;
+  padding:11px 8px;
+  border-radius:8px;
+  font-size:13.5px;
+  font-weight:700;
+  font-family:inherit;
+  cursor:pointer;
+  border:1.5px solid var(--rule);
+  background:#fff;
+  color:var(--ink-soft);
+}
+#archiveOkBtn{border-color:var(--forest);background:var(--forest);color:#fff;}
+#archiveOkBtn:active{opacity:0.85;}
+#archiveCancelBtn:active{background:var(--paper-dark);}
+#archiveDownloadLink{
+  display:block;
+  width:100%;
+  box-sizing:border-box;
+  text-align:center;
+  padding:13px 8px;
+  border-radius:8px;
+  background:var(--forest);
+  color:#fff;
+  font-weight:700;
+  font-size:14px;
+  text-decoration:none;
+  margin-bottom:14px;
+}
+#archiveDownloadLink:active{opacity:0.85;}
+#archiveCloseReadyBtn{width:100%;}
+
+#driveConfigOverlay{
+  position:fixed; inset:0;
+  background:rgba(38,52,75,0.4);
+  z-index:60;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:0 24px;
+}
+#driveConfigOverlay.open{display:flex;}
+#driveConfigPanel{
+  background:var(--paper);
+  border-radius:14px;
+  max-width:360px;
+  width:100%;
+  padding:20px 18px 16px;
+  box-shadow:0 10px 34px rgba(0,0,0,0.32);
+  border:1px solid var(--rule-soft);
+}
+#driveConfigMessage{font-size:14px;line-height:1.6;color:var(--ink);margin-bottom:12px;}
+#driveConfigUrlInput, #driveConfigTokenInput{
+  width:100%;
+  border:1px solid var(--rule);
+  border-radius:8px;
+  padding:9px 10px;
+  font-size:13px;
+  font-family:inherit;
+  background:#fff;
+  color:var(--ink);
+  margin-bottom:10px;
+  box-sizing:border-box;
+}
+#driveConfigButtons{display:flex;gap:8px;}
+#driveConfigButtons button{
+  flex:1;
+  padding:11px 8px;
+  border-radius:8px;
+  font-size:13.5px;
+  font-weight:700;
+  font-family:inherit;
+  cursor:pointer;
+  border:1.5px solid var(--rule);
+  background:#fff;
+  color:var(--ink-soft);
+}
+#driveConfigSaveBtn{border-color:var(--forest);background:var(--forest);color:#fff;}
+#driveConfigSaveBtn:active{opacity:0.85;}
+#driveConfigCancelBtn:active{background:var(--paper-dark);}
+
+/* アーカイブ(閲覧専用)モード時のロックダウン表示 */
+body.archive-mode input:disabled,
+body.archive-mode textarea:disabled{
+  background:#EDE9D8;
+  color:var(--ink-soft);
+  opacity:1;
+  -webkit-text-fill-color:var(--ink-soft);
+}
+body.archive-mode .kbtn:disabled{opacity:0.5;}
+body.archive-mode .chip{pointer-events:none;}
+body.archive-mode .stepbtn,
+body.archive-mode .addbtn,
+body.archive-mode .delrow,
+body.archive-mode #deleteSchoolBtn,
+body.archive-mode .tab-add,
+body.archive-mode #archiveExportBtn, body.archive-mode #csvExportBtn, body.archive-mode #driveSaveBtn, body.archive-mode #driveConfigBtn{display:none !important;}
+
+::-webkit-scrollbar{width:0;height:0;}
+</style>
+</head>
+<body>
+
+<div id="archiveBanner"></div>
+<div id="topbar">
+  <div class="titles">
+    <input id="schoolName" type="text" placeholder="学校名" autocomplete="off">
+    <span id="pageKind">―</span>
+  </div>
+  <div class="topbar-actions">
+    <div id="contactInfo">
+      <input id="telInput" class="contact-input" placeholder="TEL 未入力" autocomplete="off">
+      <input id="faxInput" class="contact-input" placeholder="FAX 未入力" autocomplete="off">
+    </div>
+    <button id="searchBtn" aria-label="学校を検索">🔍</button>
+    <button id="deleteSchoolBtn" aria-label="この学校を削除">🗑</button>
+  </div>
+</div>
+
+<div id="searchOverlay">
+  <div id="searchPanel">
+    <div id="searchInputRow">
+      <input type="text" id="searchInput" placeholder="学校名で検索..." autocomplete="off">
+      <button id="searchCloseBtn" aria-label="閉じる">×</button>
+    </div>
+    <div id="searchResults"></div>
+    <button id="archiveExportBtn" type="button">📦 年度アーカイブを書き出す</button>
+    <button id="csvExportBtn" type="button">📊 <span id="csvYearLabel">R8</span>年度 受注集計・教科メモをExcel書き出す</button>
+    <button id="driveSaveBtn" type="button">☁️ Google Driveに保存</button>
+    <button id="driveConfigBtn" type="button">⚙️ Drive連携設定</button>
+  </div>
+</div>
+
+<div id="archiveOverlay">
+  <div id="archivePanel">
+    <div id="archiveStepInput">
+      <div id="archiveMessage">書き出す年度名を入力してください（例：令和8年度）</div>
+      <input type="text" id="archiveYearInput" placeholder="令和8年度" autocomplete="off">
+      <div id="archiveButtons">
+        <button id="archiveCancelBtn" type="button">キャンセル</button>
+        <button id="archiveOkBtn" type="button">書き出す</button>
+      </div>
+    </div>
+    <div id="archiveStepReady" style="display:none;">
+      <div id="archiveMessage">書き出しの準備ができました。下のボタンをタップして保存してください。</div>
+      <a id="archiveDownloadLink" href="#" download>📥 保存する</a>
+      <div id="archiveButtons">
+        <button id="archiveCloseReadyBtn" type="button">閉じる</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="driveConfigOverlay">
+  <div id="driveConfigPanel">
+    <div id="driveConfigMessage">Google Apps Script Webアプリの接続情報を入力してください</div>
+    <input type="text" id="driveConfigUrlInput" placeholder="WebアプリのURL（末尾が/exec）" autocomplete="off">
+    <input type="text" id="driveConfigTokenInput" placeholder="共有トークン" autocomplete="off">
+    <div id="driveConfigButtons">
+      <button id="driveConfigCancelBtn" type="button">キャンセル</button>
+      <button id="driveConfigSaveBtn" type="button">保存する</button>
+    </div>
+  </div>
+</div>
+
+<div id="confirmOverlay">
+  <div id="confirmPanel">
+    <div id="confirmMessage"></div>
+    <div id="confirmButtons">
+      <button id="confirmCancelBtn" type="button">キャンセル</button>
+      <button id="confirmOkBtn" type="button">削除する</button>
+    </div>
+  </div>
+</div>
+
+<div id="tabRail"></div>
+
+<div id="saveToast"></div>
+
+<div id="viewport">
+  <div id="pageTrack"></div>
+</div>
+
+<div id="bottomnav">
+  <button class="navbtn" id="prevBtn" aria-label="前へ">‹</button>
+  <div id="dots"></div>
+  <button class="navbtn" id="nextBtn" aria-label="次へ">›</button>
+</div>
+
+<script id="data-schools" type="application/json">[]</script>
+<script id="data-archive" type="application/json"></script>
+<script id="data-items" type="application/json">[{"title": "教材", "items": [{"name": "理科学習ノート", "price": 580, "grades": [1, 2, 3], "pubs": ["東書"], "subject": "理科"}, {"name": "保健学習ノート", "price": 500, "grades": [1, 2, 3], "pubs": ["学研", "東書"], "shuninKey": "hoken_taiiku", "shuninLabel": "保健体育（保健・体育実技）", "subject": "保健体育"}, {"name": "体育実技ノート", "price": 500, "grades": [1, 2, 3], "pubs": [], "shuninKey": "hoken_taiiku", "subject": "保健体育"}, {"name": "地理学習ノートⅠ", "price": 590, "grades": [1], "pubs": [], "shuninKey": "shakai", "shuninLabel": "社会（地理・歴史）", "subject": "社会"}, {"name": "地理学習ノートⅡ", "price": 590, "grades": [2], "pubs": [], "shuninKey": "shakai", "subject": "社会"}, {"name": "歴史学習ノートⅠ", "price": 590, "grades": [1], "pubs": [], "shuninKey": "shakai", "subject": "社会"}, {"name": "歴史学習ノートⅡ", "price": 590, "grades": [2], "pubs": [], "shuninKey": "shakai", "subject": "社会"}, {"name": "歴史学習ノートⅢ", "price": 590, "grades": [3], "pubs": [], "shuninKey": "shakai", "subject": "社会"}, {"name": "ニュートンJr.", "price": 580, "grades": [1, 2, 3], "pubs": ["東書"], "subject": "数学"}, {"name": "新版 英語学習ノート", "price": 670, "grades": [1, 2, 3], "pubs": ["開隆堂"], "subject": "英語"}]}, {"title": "技家", "items": [{"name": "家庭分野パート1", "price": 510, "grades": [0], "pubs": ["東書", "教図"], "shuninKey": "katei", "subject": "家庭科", "cycleGrade": true}, {"name": "家庭分野パート2", "price": 510, "grades": [0], "pubs": ["東書", "教図"], "shuninKey": "katei", "subject": "家庭科", "cycleGrade": true}, {"name": "家庭分野1", "price": 480, "grades": [1], "pubs": ["東書"], "shuninKey": "katei", "subject": "家庭科"}, {"name": "解答シール", "price": 60, "grades": [0], "pubs": ["東書"], "shuninKey": "katei", "subject": "家庭科"}, {"name": "家庭分野2", "price": 480, "grades": [2], "pubs": ["東書"], "shuninKey": "katei", "subject": "家庭科"}, {"name": "家庭分野3", "price": 320, "grades": [3], "pubs": ["東書"], "shuninKey": "katei", "subject": "家庭科"}, {"name": "材料と加工", "price": 370, "grades": [0], "pubs": ["東書", "開隆堂"], "shuninKey": "gijutsu", "cycleGrade": true, "subject": "技術"}, {"name": "エネルギー変換・生物育成", "price": 410, "grades": [0], "pubs": ["東書", "開隆堂"], "shuninKey": "gijutsu", "cycleGrade": true, "subject": "技術"}, {"name": "情報", "price": 370, "grades": [0], "pubs": ["東書", "開隆堂"], "shuninKey": "gijutsu", "cycleGrade": true, "subject": "技術"}]}, {"title": "その他", "items": [{"name": "道徳ノート", "price": 160, "grades": [1, 2, 3], "pubs": [], "subject": "道徳"}, {"name": "身分証明書", "price": null, "grades": [0], "pubs": [], "shuninKey": "sonota", "subject": "その他"}, {"name": "パウチフィルム", "price": 12, "grades": [0], "pubs": [], "shuninKey": "sonota", "subject": "その他"}]}]</script>
+<script>
+(function(){
+'use strict';
+
+const SCHOOLS = JSON.parse(document.getElementById('data-schools').textContent);
+const SECTIONS = JSON.parse(document.getElementById('data-items').textContent);
+const SUBJECTS = ['理科','体育','社会','数学','英語','家庭科','技術','その他'];
+const SUBJECT_DOT = {'理科':'理','体育':'体','社会':'社','数学':'数','英語':'英','家庭科':'家','技術':'技','その他':'他'};
+
+// ---- アーカイブ(閲覧専用)判定 ----
+const ARCHIVE_EL = document.getElementById('data-archive');
+const ARCHIVE_DATA = (ARCHIVE_EL && ARCHIVE_EL.textContent.trim()) ? JSON.parse(ARCHIVE_EL.textContent) : null;
+const IS_ARCHIVE = !!ARCHIVE_DATA;
+if(IS_ARCHIVE) document.body.classList.add('archive-mode');
+
+const TAB_COLORS = ['var(--tab-1)','var(--tab-2)','var(--tab-3)','var(--tab-4)','var(--tab-5)','var(--tab-6)'];
+
+// ---- storage helpers (Claude artifact環境ではwindow.storage、スタンドアロン
+// ファイルとして開いた場合はlocalStorageに保存し、どちらも使えない場合のみ
+// メモリ内(セッション限り)にフォールバックする) ----
+const STORAGE_PREFIX = 'jhs-ledger:';
+const memFallback = {};
+let storageOK = !!(window.storage && window.storage.get && window.storage.set);
+let localStorageOK = false;
+try{
+  const testKey = '__ls_test__';
+  window.localStorage.setItem(testKey, '1');
+  window.localStorage.removeItem(testKey);
+  localStorageOK = true;
+}catch(e){ localStorageOK = false; }
+
+async function storeGet(key){
+  if(IS_ARCHIVE){
+    if(key === 'schools') return ARCHIVE_DATA.schools || [];
+    if(key === 'yearLabels4') return ARCHIVE_DATA.yearLabels4 || null;
+    if(key === 'lastPage') return null;
+    const recs = ARCHIVE_DATA.records || {};
+    return Object.prototype.hasOwnProperty.call(recs, key) ? recs[key] : null;
+  }
+  if(storageOK){
+    try{
+      const r = await window.storage.get(key, false);
+      return r ? JSON.parse(r.value) : null;
+    }catch(e){ /* fall through */ }
+  }
+  if(localStorageOK){
+    try{
+      const raw = window.localStorage.getItem(STORAGE_PREFIX + key);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ /* fall through */ }
+  }
+  return memFallback[key] || null;
+}
+async function storeSet(key, value){
+  if(IS_ARCHIVE) return; // 閲覧専用アーカイブでは保存しない
+  if(storageOK){
+    try{
+      await window.storage.set(key, JSON.stringify(value), false);
+      if(key.indexOf('rec:')===0 || key.indexOf('memo:')===0) RECORDED_KEYS.add(key);
+      return;
+    }
+    catch(e){ /* fall through */ }
+  }
+  if(localStorageOK){
+    try{
+      window.localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value));
+      if(key.indexOf('rec:')===0 || key.indexOf('memo:')===0) RECORDED_KEYS.add(key);
+      return;
+    }catch(e){ /* fall through(容量超過などの場合) */ }
+  }
+  memFallback[key] = value;
+  if(key.indexOf('rec:')===0 || key.indexOf('memo:')===0) RECORDED_KEYS.add(key);
+}
+async function storeDelete(key){
+  if(IS_ARCHIVE) return;
+  if(storageOK){
+    try{ await window.storage.delete(key, false); }
+    catch(e){ /* ignore */ }
+  } else if(localStorageOK){
+    try{ window.localStorage.removeItem(STORAGE_PREFIX + key); }
+    catch(e){ /* ignore */ }
+  } else {
+    delete memFallback[key];
+  }
+  RECORDED_KEYS.delete(key);
+}
+
+// ---- pages: 1校 = 台帳 + メモ ----
+const PAGES = [];
+const PAGES_PER_SCHOOL = 1 + SUBJECTS.length;
+function pagesForSchool(si){
+  return [{schoolIdx:si, kind:'ledger'}, ...SUBJECTS.map(sub=>({schoolIdx:si, kind:'memo', subject:sub}))];
+}
+function rebuildPages(){
+  PAGES.length = 0;
+  SCHOOLS.forEach((s, si)=>{ PAGES.push(...pagesForSchool(si)); });
+}
+rebuildPages();
+
+let currentIndex = 0;
+let currentData = null;
+let saveTimer = null;
+let YEAR_LABELS = ['R5','R6','R7','R8'];
+
+const pageTrack = document.getElementById('pageTrack');
+const schoolNameEl = document.getElementById('schoolName');
+const pageKindEl = document.getElementById('pageKind');
+const telInputEl = document.getElementById('telInput');
+const faxInputEl = document.getElementById('faxInput');
+const tabRail = document.getElementById('tabRail');
+const dotsEl = document.getElementById('dots');
+
+// ---------------- RECORDED-DATA TRACKING ----------------
+const RECORDED_KEYS = new Set();
+async function loadRecordedKeys(){
+  if(IS_ARCHIVE){
+    Object.keys(ARCHIVE_DATA.records || {}).forEach(k=> RECORDED_KEYS.add(k));
+    return;
+  }
+  if(storageOK){
+    try{
+      const recRes = await window.storage.list('rec:', false);
+      const memoRes = await window.storage.list('memo:', false);
+      (recRes && recRes.keys || []).forEach(k=> RECORDED_KEYS.add(k));
+      (memoRes && memoRes.keys || []).forEach(k=> RECORDED_KEYS.add(k));
+      return;
+    }catch(e){ /* fall through */ }
+  }
+  if(localStorageOK){
+    try{
+      for(let i=0; i<window.localStorage.length; i++){
+        const fullKey = window.localStorage.key(i);
+        if(!fullKey || fullKey.indexOf(STORAGE_PREFIX)!==0) continue;
+        const k = fullKey.slice(STORAGE_PREFIX.length);
+        if(k.indexOf('rec:')===0 || k.indexOf('memo:')===0) RECORDED_KEYS.add(k);
+      }
+      return;
+    }catch(e){ /* fall through */ }
+  }
+  Object.keys(memFallback).forEach(k=>{
+    if(k.indexOf('rec:')===0 || k.indexOf('memo:')===0) RECORDED_KEYS.add(k);
+  });
+}
+function schoolHasMemo(s){
+  for(const sub of SUBJECTS){ if(RECORDED_KEYS.has(`memo:${s.id}:${sub}`)) return true; }
+  return false;
+}
+function schoolHasData(s){
+  return RECORDED_KEYS.has(`rec:${s.id}:1`) || schoolHasMemo(s);
+}
+function refreshBadges(){
+  updateTabRail();
+  if(PAGES.length === 0) return;
+  const s = SCHOOLS[PAGES[currentIndex].schoolIdx];
+  [...dotsEl.children].forEach((el,i)=>{
+    const has = i===0 ? RECORDED_KEYS.has(`rec:${s.id}:1`) : RECORDED_KEYS.has(`memo:${s.id}:${SUBJECTS[i-1]}`);
+    el.classList.toggle('has-data', has);
+  });
+}
+
+// ---------------- TAB RAIL ----------------
+function buildTabRail(){
+  tabRail.innerHTML = '';
+  SCHOOLS.forEach((s, si)=>{
+    const btn = document.createElement('button');
+    btn.className = 'tab';
+    btn.style.background = s.color || TAB_COLORS[si % TAB_COLORS.length];
+    btn.style.color = s.textColor || '#fff';
+    btn.dataset.si = si;
+    const dot = document.createElement('span');
+    dot.className = 'tabdot';
+    btn.appendChild(dot);
+    btn.appendChild(document.createTextNode(s.tab));
+    btn.addEventListener('click', ()=>{
+      goTo(si * PAGES_PER_SCHOOL, true);
+    });
+    tabRail.appendChild(btn);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className = 'tab-add';
+  addBtn.textContent = '＋';
+  addBtn.setAttribute('aria-label', '学校を追加');
+  addBtn.addEventListener('click', addSchool);
+  tabRail.appendChild(addBtn);
+}
+
+// 学校名変更など「並び・件数は変わらない」更新用。tabRail全体を作り直さないため、
+// ちょうどそのタイミングで他のボタン(＋など)をタップしていても取りこぼさない。
+function updateTabLabel(si){
+  const btn = tabRail.querySelector(`.tab[data-si="${si}"]`);
+  if(!btn) return;
+  const s = SCHOOLS[si];
+  // dot(先頭のspan)は残し、テキストノードだけ差し替える
+  while(btn.lastChild && btn.lastChild.nodeType === Node.TEXT_NODE){
+    btn.removeChild(btn.lastChild);
+  }
+  btn.appendChild(document.createTextNode(s.tab));
+  btn.style.background = s.color || TAB_COLORS[si % TAB_COLORS.length];
+  btn.style.color = s.textColor || '#fff';
+}
+
+function updateTabRail(){
+  if(PAGES.length === 0) return;
+  const activeSi = PAGES[currentIndex].schoolIdx;
+  [...tabRail.children].forEach((el)=>{
+    if(el.classList.contains('tab-add')) return;
+    const si = Number(el.dataset.si);
+    const on = si === activeSi;
+    el.classList.toggle('active', on);
+    el.classList.toggle('has-data', schoolHasData(SCHOOLS[si]));
+    if(on) el.scrollIntoView({block:'nearest', behavior:'auto'});
+  });
+}
+
+// ---------------- ADD SCHOOL ----------------
+async function addSchool(){
+  if(IS_ARCHIVE) return;
+  const si = SCHOOLS.length;
+  const newSchool = {
+    id: `school-${Date.now()}-${Math.random().toString(36).slice(2,6)}`,
+    name: '新しい学校',
+    tab: '新しい学校',
+    tel: '',
+    fax: '',
+    color: TAB_COLORS[si % TAB_COLORS.length],
+    textColor: '#FFFFFF'
+  };
+  SCHOOLS.push(newSchool);
+  PAGES.push(...pagesForSchool(si));
+  await storeSet('schools', SCHOOLS);
+  buildTabRail();
+  await render(si * PAGES_PER_SCHOOL);
+  schoolNameEl.focus();
+  schoolNameEl.select();
+}
+
+// ---------------- DELETE SCHOOL ----------------
+function showConfirm(message){
+  return new Promise(resolve=>{
+    const overlay = document.getElementById('confirmOverlay');
+    document.getElementById('confirmMessage').textContent = message;
+    overlay.classList.add('open');
+    const okBtn = document.getElementById('confirmOkBtn');
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+    function cleanup(result){
+      overlay.classList.remove('open');
+      okBtn.removeEventListener('click', onOk);
+      cancelBtn.removeEventListener('click', onCancel);
+      overlay.removeEventListener('click', onBackdrop);
+      resolve(result);
+    }
+    function onOk(){ cleanup(true); }
+    function onCancel(){ cleanup(false); }
+    function onBackdrop(e){ if(e.target === overlay) cleanup(false); }
+    okBtn.addEventListener('click', onOk);
+    cancelBtn.addEventListener('click', onCancel);
+    overlay.addEventListener('click', onBackdrop);
+  });
+}
+
+async function deleteCurrentSchool(){
+  if(IS_ARCHIVE) return;
+  if(PAGES.length === 0) return;
+  const si = PAGES[currentIndex].schoolIdx;
+  const s = SCHOOLS[si];
+  const ok = await showConfirm(`「${s.tab}」を削除します。\n入力済みの台帳・メモのデータも削除され、元に戻せません。よろしいですか？`);
+  if(!ok) return;
+
+  clearTimeout(saveTimer);
+  await storeDelete(`rec:${s.id}:1`);
+  for(const sub of SUBJECTS) await storeDelete(`memo:${s.id}:${sub}`);
+
+  SCHOOLS.splice(si, 1);
+  rebuildPages();
+  await storeSet('schools', SCHOOLS);
+  buildTabRail();
+
+  if(PAGES.length === 0){
+    renderEmptyState();
+    showToast('学校を削除しました');
+    return;
+  }
+  const nextIdx = Math.min(si * PAGES_PER_SCHOOL, PAGES.length - 1);
+  await render(nextIdx);
+  showToast('学校を削除しました');
+}
+
+// ---------------- BOTTOM DOTS ----------------
+function buildDots(){
+  const si = PAGES[currentIndex].schoolIdx;
+  const s = SCHOOLS[si];
+  dotsEl.innerHTML = '';
+  const d = document.createElement('div');
+  d.className = 'dot';
+  d.textContent = '台';
+  if(RECORDED_KEYS.has(`rec:${s.id}:1`)) d.classList.add('has-data');
+  d.addEventListener('click', ()=> goTo(si*PAGES_PER_SCHOOL, true));
+  dotsEl.appendChild(d);
+  SUBJECTS.forEach((sub, si2)=>{
+    const m = document.createElement('div');
+    m.className = 'dot subj';
+    if(RECORDED_KEYS.has(`memo:${s.id}:${sub}`)) m.classList.add('has-data');
+    m.textContent = SUBJECT_DOT[sub];
+    m.title = sub;
+    m.addEventListener('click', ()=> goTo(si*PAGES_PER_SCHOOL + 1 + si2, true));
+    dotsEl.appendChild(m);
+  });
+  updateDots();
+}
+function updateDots(){
+  const p = PAGES[currentIndex];
+  [...dotsEl.children].forEach((el, i)=>{
+    const on = (p.kind==='ledger' && i===0) || (p.kind==='memo' && SUBJECTS[i-1] === p.subject);
+    el.classList.toggle('active', on);
+  });
+}
+
+// ---------------- KEY BUILDERS ----------------
+function recordKey(p){
+  const s = SCHOOLS[p.schoolIdx];
+  return p.kind==='ledger' ? `rec:${s.id}:1` : `memo:${s.id}:${p.subject}`;
+}
+
+function defaultLedgerData(){
+  return { qty:{}, shunin:{}, kettei:{}, enrol:['','',''], visits:[], priceOverride:{}, pubSelect:{}, teacherCount:{}, gradeCycle:{} };
+}
+function defaultMemoData(){
+  return { entries:[] };
+}
+
+// ---------------- RENDER ----------------
+async function render(idx){
+  currentIndex = idx;
+  const p = PAGES[idx];
+  const school = SCHOOLS[p.schoolIdx];
+
+  schoolNameEl.disabled = false;
+  schoolNameEl.value = school.tab;
+  pageKindEl.textContent = p.kind==='ledger' ? '受注台帳' : `${p.subject}メモ`;
+  telInputEl.value = school.tel || '';
+  faxInputEl.value = school.fax || '';
+
+  updateTabRail();
+  buildDots();
+
+  const key = recordKey(p);
+  const stored = await storeGet(key);
+  currentData = stored || (p.kind==='ledger' ? defaultLedgerData() : defaultMemoData());
+  if(p.kind==='ledger'){
+    currentData = Object.assign(defaultLedgerData(), currentData);
+    if(!Array.isArray(currentData.enrol) || currentData.enrol.length !== 3) currentData.enrol = ['','',''];
+  } else {
+    currentData = Object.assign(defaultMemoData(), currentData);
+  }
+
+  pageTrack.innerHTML = p.kind==='ledger' ? renderLedgerPage(p) : renderMemoPage(p);
+  pageTrack.scrollTop = 0;
+  pageTrack.classList.remove('fade-enter');
+  void pageTrack.offsetWidth;
+  pageTrack.classList.add('fade-enter');
+
+  wireEvents(p);
+  storeSet('lastPage', idx);
+  if(IS_ARCHIVE) lockdownUI();
+}
+
+function lockdownUI(){
+  pageTrack.querySelectorAll('input, textarea, button').forEach(el=> el.disabled = true);
+  schoolNameEl.disabled = true;
+  telInputEl.disabled = true;
+  faxInputEl.disabled = true;
+}
+
+function showArchiveBanner(){
+  const el = document.getElementById('archiveBanner');
+  const year = esc(ARCHIVE_DATA.yearName || '');
+  const date = esc(ARCHIVE_DATA.exportDate || '');
+  el.textContent = `📦 閲覧専用アーカイブ（${year}）・書き出し日: ${date}`;
+}
+
+function esc(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// 右端(最新)年度ラベルから左3列分を自動算出（例: R8 → R5,R6,R7,R8）
+function cascadeYearLabels(rightVal){
+  const m = rightVal.match(/^(\D*)(\d+)(\D*)$/);
+  if(!m) return null;
+  const prefix = m[1], num = parseInt(m[2],10), suffix = m[3];
+  if(isNaN(num)) return null;
+  return [0,1,2].map(i => `${prefix}${num-(3-i)}${suffix}`);
+}
+
+// ---------------- SAVE TOAST ----------------
+let toastTimer = null;
+function showToast(message, opts){
+  opts = opts || {};
+  const el = document.getElementById('saveToast');
+  el.innerHTML = `<span class="tick">✓</span><span>${esc(message)}</span>` +
+    (opts.undo ? `<span class="undoLink" id="toastUndo">元に戻す</span>` : '');
+  if(opts.undo){
+    document.getElementById('toastUndo').addEventListener('click', ()=>{
+      opts.undo();
+      el.classList.remove('show');
+      clearTimeout(toastTimer);
+    });
+  }
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> el.classList.remove('show'), opts.duration || (opts.undo ? 3200 : 1400));
+}
+
+// ---------------- LEDGER PAGE ----------------
+function renderLedgerPage(p){
+  let html = '';
+  SECTIONS.forEach((sec, si)=>{
+    html += `<div class="section xlsection"><h2><span class="eyebrow">${esc(sec.title)}</span> 受注状況</h2>`;
+    html += `<div class="xltable-wrap"><table class="xltable"><thead><tr>
+      <th class="corner">教科名</th>
+      <th class="gcol">学年</th>
+      <th class="ycol"><input type="text" class="yearlabel-input" data-yearidx="0" value="${esc(YEAR_LABELS[0])}"></th>
+      <th class="ycol"><input type="text" class="yearlabel-input" data-yearidx="1" value="${esc(YEAR_LABELS[1])}"></th>
+      <th class="ycol"><input type="text" class="yearlabel-input" data-yearidx="2" value="${esc(YEAR_LABELS[2])}"></th>
+      <th class="ycol hl"><input type="text" class="yearlabel-input" data-yearidx="3" value="${esc(YEAR_LABELS[3])}"></th>
+      <th class="shcol">主任</th>
+    </tr></thead><tbody>`;
+
+    let ii = 0;
+    while(ii < sec.items.length){
+      const item = sec.items[ii];
+      const key = item.shuninKey || null;
+      let endIdx = ii;
+      if(key){
+        while(endIdx+1 < sec.items.length && sec.items[endIdx+1].shuninKey === key) endIdx++;
+      }
+      const groupItems = sec.items.slice(ii, endIdx+1);
+      const totalRows = groupItems.reduce((sum,it)=> sum + it.grades.length, 0);
+      const shuninStoreKey = key || `${si}-${ii}`;
+      const labelText = shuninStoreKey === 'sonota' ? '担当者' : '主任';
+      let firstRowOfGroup = true;
+
+      groupItems.forEach((gItem, gOffset)=>{
+        const realIdx = ii + gOffset;
+        const priceKey = `${si}-${realIdx}`;
+        const priceHtml = typeof gItem.price==='number'
+          ? `¥${gItem.price}`
+          : `¥<input type="number" inputmode="numeric" min="0" class="price-input" data-priceidx="${priceKey}" placeholder="金額" value="${esc(currentData.priceOverride[priceKey]||'')}">`;
+        let pubHtml = '';
+        if(gItem.pubs && gItem.pubs.length){
+          const selPub = currentData.pubSelect[priceKey];
+          pubHtml = `<div class="pubrow-mini" data-pubgroup="${priceKey}">` +
+            gItem.pubs.map((pub,pi)=> `<span class="chip ${selPub===pi?'on':''}" data-itemkey="${priceKey}" data-pubidx="${pi}"><span class="ring"></span>${esc(pub)}</span>`).join('') +
+            `</div>`;
+        }
+
+        gItem.grades.forEach((g, gi)=>{
+          html += `<tr>`;
+          if(gi === 0){
+            html += `<td class="itemcell" rowspan="${gItem.grades.length}">
+              <div class="itemname">${esc(gItem.name)}</div>
+              <div class="itemprice">${priceHtml}</div>
+              ${pubHtml}
+            </td>`;
+          }
+          html += `<td class="gradecell">${g ? g+'年' : '―'}</td>`;
+          for(let y=0; y<4; y++){
+            const k = `${si}-${realIdx}-${g}-${y}`;
+            const hl = y===3 ? ' hl' : '';
+            if(gItem.cycleGrade){
+              const gcVal = currentData.gradeCycle[k] || '';
+              html += `<td class="qtycell qtycell-stack${hl}"><div class="qtybox">
+                <button type="button" class="gradecycle-btn" data-gckey="${k}">${gcVal ? gcVal+'年' : '―'}</button>
+                <input type="number" inputmode="numeric" min="0" class="xlqty" data-qkey="${k}" value="${esc(currentData.qty[k]||'')}">
+              </div></td>`;
+            } else {
+              html += `<td class="qtycell${hl}"><input type="number" inputmode="numeric" min="0" class="xlqty" data-qkey="${k}" value="${esc(currentData.qty[k]||'')}"></td>`;
+            }
+          }
+          if(firstRowOfGroup){
+            html += `<td class="shunincell" rowspan="${totalRows}">
+              <input type="text" class="shunin-name" placeholder="${labelText}" data-skey="${esc(shuninStoreKey)}" value="${esc(currentData.shunin[shuninStoreKey]||'')}">
+              <div class="shunin-div"></div>
+              <div class="shunin-teacher">
+                <span class="tlabel">教師用</span>
+                <input type="number" inputmode="numeric" min="0" class="teacher-count" data-teacherkey="${esc(shuninStoreKey)}" value="${esc(currentData.teacherCount[shuninStoreKey]||'')}">
+              </div>
+            </td>`;
+            firstRowOfGroup = false;
+          }
+          html += `</tr>`;
+        });
+      });
+      ii = endIdx + 1;
+    }
+    html += `</tbody></table></div></div>`;
+  });
+
+  // --- 学年別在籍数 ---
+  html += `<div class="section"><h2><span class="eyebrow">在籍</span> 学年別人数</h2><div class="enrolgrid">`;
+  for(let g=0; g<3; g++){
+    html += `<div class="classcell"><span class="clabel">${g+1}年</span><div class="stepper">
+      <button type="button" class="stepbtn" data-steptarget="enr-${g}" data-stepdelta="-1">−</button>
+      <input type="number" inputmode="numeric" min="0" id="enr-${g}" data-enrolidx="${g}" value="${esc(currentData.enrol[g])}">
+      <button type="button" class="stepbtn" data-steptarget="enr-${g}" data-stepdelta="1">＋</button>
+    </div></div>`;
+  }
+  const total = currentData.enrol.reduce((a,b)=> a + (parseInt(b)||0), 0);
+  html += `</div><div class="classtotal">在籍合計　<b id="enrolTotal">${total}</b> 名</div></div>`;
+
+  // --- 営業記録 ---
+  html += `<div class="section"><h2><span class="eyebrow">記録</span> 営業内容</h2><div id="visitsList">`;
+  html += renderVisits(currentData.visits);
+  html += `</div><button class="addbtn" id="addVisit">＋ 記録を追加</button></div>`;
+
+  return html;
+}
+
+function renderVisits(rows){
+  if(!rows.length) return `<div class="empty-hint">訪問記録がまだありません。</div>`;
+  return rows.map((r,i)=>`
+    <div class="dyn-row" data-vidx="${i}">
+      <button class="delrow" data-delvisit="${i}">×</button>
+      <div class="visit-cols">
+        <input type="date" data-vfield="date" data-vidx="${i}" value="${esc(r.date)}">
+        <input type="text" placeholder="先生名" data-vfield="teacher" data-vidx="${i}" value="${esc(r.teacher)}">
+        <textarea placeholder="営業内容" data-vfield="content" data-vidx="${i}">${esc(r.content)}</textarea>
+      </div>
+    </div>`).join('');
+}
+
+function renderMemoPage(p){
+  const school = SCHOOLS[p.schoolIdx];
+  let html = `<div class="memopage-hero">${esc(school.tab)}　<span class="stamp">${esc(p.subject)}</span></div>`;
+  html += `<div class="section"><h2><span class="eyebrow">記録</span> 訪問・営業ログ</h2><div id="visitsList">`;
+  html += renderVisits(currentData.entries);
+  html += `</div><button class="addbtn" id="addVisit">＋ 記録を追加</button></div>`;
+  return html;
+}
+
+// ---------------- EVENT WIRING ----------------
+function scheduleSave(){
+  if(IS_ARCHIVE) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    await storeSet(recordKey(PAGES[currentIndex]), currentData);
+    showToast('保存しました');
+    refreshBadges();
+  }, 250);
+}
+
+function wireEvents(p){
+  pageTrack.querySelectorAll('.stepbtn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const input = document.getElementById(btn.dataset.steptarget);
+      if(!input) return;
+      const next = Math.max(0, (parseInt(input.value)||0) + Number(btn.dataset.stepdelta));
+      input.value = next;
+      input.dispatchEvent(new Event('input', {bubbles:true}));
+    });
+  });
+
+  // 年度ラベル(4列・全台帳共通)
+  pageTrack.querySelectorAll('[data-yearidx]').forEach(el=>{
+    el.addEventListener('change', ()=>{
+      const y = Number(el.dataset.yearidx);
+      const val = el.value.trim() || YEAR_LABELS[y];
+      YEAR_LABELS[y] = val;
+      pageTrack.querySelectorAll(`[data-yearidx="${y}"]`).forEach(x=> x.value = val);
+      // 一番右側(最新年度)を入力したら、左3列を自動算出して連動
+      if(y === 3){
+        const auto = cascadeYearLabels(val);
+        if(auto){
+          for(let i=0; i<3; i++){
+            YEAR_LABELS[i] = auto[i];
+            pageTrack.querySelectorAll(`[data-yearidx="${i}"]`).forEach(x=> x.value = auto[i]);
+          }
+        }
+      }
+      storeSet('yearLabels4', YEAR_LABELS);
+      updateCsvYearLabel();
+    });
+  });
+
+  if(p.kind==='ledger'){
+    // 数量(生徒用)
+    pageTrack.querySelectorAll('[data-qkey]').forEach(el=>{
+      el.addEventListener('input', ()=>{
+        currentData.qty[el.dataset.qkey] = el.value;
+        scheduleSave();
+      });
+    });
+    // 各年度(R5〜R8)列: 3桁(百の位まで)入力したら同じ列の次の行へ自動移動
+    const qtyColumns = {0:[], 1:[], 2:[], 3:[]};
+    pageTrack.querySelectorAll('.xlqty').forEach(el=>{
+      const y = Number(el.dataset.qkey.split('-').pop());
+      if(qtyColumns[y]) qtyColumns[y].push(el);
+    });
+    Object.values(qtyColumns).forEach(list=>{
+      list.forEach((el, idx)=>{
+        el.addEventListener('input', ()=>{
+          if(el.value.length >= 3){
+            const next = list[idx+1];
+            if(next) next.focus();
+          }
+        });
+      });
+    });
+    // 主任(先生名)
+    pageTrack.querySelectorAll('[data-skey]').forEach(el=>{
+      el.addEventListener('input', ()=>{
+        currentData.shunin[el.dataset.skey] = el.value;
+        scheduleSave();
+      });
+    });
+    // 教師用の数
+    pageTrack.querySelectorAll('[data-teacherkey]').forEach(el=>{
+      el.addEventListener('input', ()=>{
+        currentData.teacherCount[el.dataset.teacherkey] = el.value;
+        scheduleSave();
+      });
+    });
+    // 学年ループ切替(材料と加工・エネルギー変換・情報)
+    pageTrack.querySelectorAll('[data-gckey]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const key = el.dataset.gckey;
+        const cur = currentData.gradeCycle[key] || '';
+        const next = cur === '' ? '1' : cur === '1' ? '2' : cur === '2' ? '3' : '';
+        currentData.gradeCycle[key] = next;
+        el.textContent = next ? next+'年' : '―';
+        scheduleSave();
+      });
+    });
+    // 金額入力(価格未定の教材)
+    pageTrack.querySelectorAll('[data-priceidx]').forEach(el=>{
+      el.addEventListener('input', ()=>{
+        currentData.priceOverride[el.dataset.priceidx] = el.value;
+        scheduleSave();
+      });
+    });
+    // 採択(出版社)チップ ― 1教材につき1つだけ選択可
+    pageTrack.querySelectorAll('[data-itemkey][data-pubidx]').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        const key = el.dataset.itemkey;
+        const idx = Number(el.dataset.pubidx);
+        const cur = currentData.pubSelect[key];
+        currentData.pubSelect[key] = (cur === idx) ? null : idx;
+        const group = el.closest('.pubrow-mini');
+        if(group){
+          group.querySelectorAll('.chip').forEach((c,ci)=>{
+            c.classList.toggle('on', currentData.pubSelect[key] === ci);
+          });
+        }
+        scheduleSave();
+      });
+    });
+    // 在籍数
+    pageTrack.querySelectorAll('[data-enrolidx]').forEach(el=>{
+      el.addEventListener('input', ()=>{
+        currentData.enrol[Number(el.dataset.enrolidx)] = el.value;
+        const total = currentData.enrol.reduce((a,b)=> a + (parseInt(b)||0), 0);
+        const totalEl = document.getElementById('enrolTotal');
+        if(totalEl) totalEl.textContent = total;
+        scheduleSave();
+      });
+    });
+    wireVisits(currentData.visits);
+    document.getElementById('addVisit').addEventListener('click', ()=>{
+      currentData.visits.push({date:'',teacher:'',content:''});
+      document.getElementById('visitsList').innerHTML = renderVisits(currentData.visits);
+      wireVisits(currentData.visits);
+      scheduleSave();
+    });
+  } else {
+    wireVisits(currentData.entries);
+    document.getElementById('addVisit').addEventListener('click', ()=>{
+      currentData.entries.push({date:'',teacher:'',content:''});
+      document.getElementById('visitsList').innerHTML = renderVisits(currentData.entries);
+      wireVisits(currentData.entries);
+      scheduleSave();
+    });
+  }
+}
+
+function wireVisits(arr){
+  pageTrack.querySelectorAll('[data-vfield]').forEach(el=>{
+    el.addEventListener('input', ()=>{
+      arr[Number(el.dataset.vidx)][el.dataset.vfield] = el.value;
+      scheduleSave();
+    });
+  });
+  pageTrack.querySelectorAll('[data-delvisit]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const idx = Number(el.dataset.delvisit);
+      const removed = arr[idx];
+      arr.splice(idx,1);
+      document.getElementById('visitsList').innerHTML = renderVisits(arr);
+      wireVisits(arr);
+      scheduleSave();
+      showToast('記録を削除しました', {undo:()=>{
+        arr.splice(idx,0,removed);
+        document.getElementById('visitsList').innerHTML = renderVisits(arr);
+        wireVisits(arr);
+        scheduleSave();
+      }});
+    });
+  });
+}
+
+// ---------------- NAVIGATION ----------------
+function goTo(idx, animate){
+  if(PAGES.length === 0) return;
+  if(idx < 0) idx = 0;
+  if(idx > PAGES.length-1) idx = PAGES.length-1;
+  if(idx === currentIndex && !animate) return;
+  render(idx);
+}
+
+document.getElementById('prevBtn').addEventListener('click', ()=> goTo(currentIndex-1, true));
+document.getElementById('nextBtn').addEventListener('click', ()=> goTo(currentIndex+1, true));
+document.addEventListener('keydown', (e)=>{
+  const tag = (document.activeElement && document.activeElement.tagName) || '';
+  if(tag === 'INPUT' || tag === 'TEXTAREA') return;
+  if(e.key==='ArrowLeft') goTo(currentIndex-1, true);
+  if(e.key==='ArrowRight') goTo(currentIndex+1, true);
+  if(e.key==='Escape') closeSearch();
+});
+
+// ---------------- SCHOOL SEARCH ----------------
+function renderSearchResults(query){
+  const q = query.trim();
+  const resultsEl = document.getElementById('searchResults');
+  const filtered = SCHOOLS
+    .map((s, si)=>({s, si}))
+    .filter(({s})=> !q || s.tab.indexOf(q)!==-1 || s.name.indexOf(q)!==-1);
+  if(!filtered.length){
+    const msg = SCHOOLS.length===0 ? '学校がまだ登録されていません。タブ下の「＋」から追加してください。' : `「${esc(q)}」に一致する学校がありません`;
+    resultsEl.innerHTML = `<div class="searchEmpty">${msg}</div>`;
+    return;
+  }
+  resultsEl.innerHTML = filtered.map(({s, si})=>{
+    const has = schoolHasData(s);
+    return `<div class="searchResultRow" data-si="${si}">
+      <span class="swatch" style="background:${esc(s.color||'#999')}"></span>
+      <span class="srname">${esc(s.tab)}</span>
+      ${has ? '<span class="srbadge">入力済</span>' : ''}
+    </div>`;
+  }).join('');
+  resultsEl.querySelectorAll('.searchResultRow').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      const si = Number(row.dataset.si);
+      closeSearch();
+      goTo(si * PAGES_PER_SCHOOL, true);
+    });
+  });
+}
+function openSearch(){
+  document.getElementById('searchOverlay').classList.add('open');
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  renderSearchResults('');
+  setTimeout(()=> input.focus(), 30);
+}
+function closeSearch(){
+  document.getElementById('searchOverlay').classList.remove('open');
+}
+document.getElementById('searchBtn').addEventListener('click', openSearch);
+document.getElementById('deleteSchoolBtn').addEventListener('click', deleteCurrentSchool);
+document.getElementById('searchCloseBtn').addEventListener('click', closeSearch);
+document.getElementById('searchOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'searchOverlay') closeSearch();
+});
+document.getElementById('searchInput').addEventListener('input', (e)=> renderSearchResults(e.target.value));
+
+// ---------------- 年度アーカイブ書き出し ----------------
+function isIOSDevice(){
+  const ua = navigator.userAgent || '';
+  const iOSLike = /iPad|iPhone|iPod/.test(ua);
+  // iPadOS 13+ は Mac風のUser-Agentを返すため、タッチ対応で判定を補う
+  const iPadOSMasquerade = (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  return iOSLike || iPadOSMasquerade;
+}
+
+function openArchiveDialog(){
+  if(IS_ARCHIVE) return;
+  document.getElementById('archiveYearInput').value = '';
+  document.getElementById('archiveStepInput').style.display = 'block';
+  document.getElementById('archiveStepReady').style.display = 'none';
+  document.getElementById('archiveOverlay').classList.add('open');
+  setTimeout(()=> document.getElementById('archiveYearInput').focus(), 30);
+}
+function closeArchiveDialog(){
+  document.getElementById('archiveOverlay').classList.remove('open');
+  const link = document.getElementById('archiveDownloadLink');
+  if(link.href && link.href.indexOf('blob:')===0){
+    setTimeout(()=> URL.revokeObjectURL(link.href), 500);
+  }
+}
+document.getElementById('archiveExportBtn').addEventListener('click', openArchiveDialog);
+document.getElementById('archiveCancelBtn').addEventListener('click', closeArchiveDialog);
+document.getElementById('archiveCloseReadyBtn').addEventListener('click', ()=>{
+  closeArchiveDialog();
+  showToast('書き出しました');
+});
+document.getElementById('archiveOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'archiveOverlay') closeArchiveDialog();
+});
+document.getElementById('archiveOkBtn').addEventListener('click', async ()=>{
+  const yearName = document.getElementById('archiveYearInput').value.trim() || '年度未設定';
+  await exportArchive(yearName);
+});
+
+// text/html などブラウザが「表示できる」MIMEタイプだと、保存の代わりにその場で
+// 開こうとするブラウザがある(特にiOS Safari)。application/octet-streamにして
+// 「未知のファイル＝ダウンロード対象」として扱わせるのが最も確実。
+function downloadTextFile(filename, content){
+  const blob = new Blob([content], {type:'application/octet-stream'});
+  const url = URL.createObjectURL(blob);
+
+  if(isIOSDevice()){
+    // iOS Safariはプログラム的な a.click() だとファイル名(拡張子)が失われ
+    // "Unknown" として保存されてしまうことがある。ユーザーが直接タップする
+    // 本物の<a download>リンクであればファイル名が正しく保持されるため、
+    // ダイアログ内に実際にタップしてもらうリンクを表示する方式に切り替える。
+    const link = document.getElementById('archiveDownloadLink');
+    link.href = url;
+    link.download = filename;
+    link.textContent = `📥 ${filename} を保存`;
+    document.getElementById('archiveStepInput').style.display = 'none';
+    document.getElementById('archiveStepReady').style.display = 'block';
+    return;
+  }
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  closeArchiveDialog();
+  showToast('書き出しました');
+  setTimeout(()=> URL.revokeObjectURL(url), 4000);
+}
+
+async function exportArchive(yearName){
+  showToast('アーカイブを作成しています…');
+  const records = {};
+  for(const s of SCHOOLS){
+    const recVal = await storeGet(`rec:${s.id}:1`);
+    if(recVal) records[`rec:${s.id}:1`] = recVal;
+    for(const sub of SUBJECTS){
+      const mVal = await storeGet(`memo:${s.id}:${sub}`);
+      if(mVal) records[`memo:${s.id}:${sub}`] = mVal;
+    }
+  }
+  const payload = {
+    yearName,
+    exportDate: new Date().toISOString().slice(0,10),
+    schools: SCHOOLS,
+    yearLabels4: YEAR_LABELS,
+    records
+  };
+  const jsonStr = JSON.stringify(payload).replace(/</g, '\\u003c');
+  let html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+  html = html.replace(
+    /<script id="data-archive" type="application\/json">.*?<\/script>/s,
+    ()=> `<script id="data-archive" type="application/json">${jsonStr}<\/script>`
+  );
+  downloadTextFile(`教材受注台帳_中学校_${yearName}_アーカイブ.html`, html);
+}
+
+// ---------------- 受注集計・教科メモ Excel書き出し ----------------
+function updateCsvYearLabel(){
+  const el = document.getElementById('csvYearLabel');
+  if(el) el.textContent = YEAR_LABELS[3] || 'R8';
+}
+
+function downloadBlob(filename, blob){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=> URL.revokeObjectURL(url), 4000);
+}
+
+// ---- 最小限のZIP(無圧縮)生成 ----
+function crc32(bytes){
+  let crc = ~0;
+  for(let i=0; i<bytes.length; i++){
+    crc ^= bytes[i];
+    for(let j=0; j<8; j++){
+      crc = (crc >>> 1) ^ (0xEDB88320 & -(crc & 1));
+    }
+  }
+  return (~crc) >>> 0;
+}
+
+function buildZip(files){
+  const enc = new TextEncoder();
+  const localParts = [];
+  const centralParts = [];
+  let offset = 0;
+  files.forEach(f=>{
+    const nameBytes = enc.encode(f.name);
+    const data = f.data;
+    const crc = crc32(data);
+    const size = data.length;
+
+    const local = new Uint8Array(30 + nameBytes.length);
+    const ldv = new DataView(local.buffer);
+    ldv.setUint32(0, 0x04034b50, true);
+    ldv.setUint16(4, 20, true);
+    ldv.setUint16(6, 0, true);
+    ldv.setUint16(8, 0, true);
+    ldv.setUint16(10, 0, true);
+    ldv.setUint16(12, 0, true);
+    ldv.setUint32(14, crc, true);
+    ldv.setUint32(18, size, true);
+    ldv.setUint32(22, size, true);
+    ldv.setUint16(26, nameBytes.length, true);
+    ldv.setUint16(28, 0, true);
+    local.set(nameBytes, 30);
+    localParts.push(local, data);
+
+    const central = new Uint8Array(46 + nameBytes.length);
+    const cdv = new DataView(central.buffer);
+    cdv.setUint32(0, 0x02014b50, true);
+    cdv.setUint16(4, 20, true);
+    cdv.setUint16(6, 20, true);
+    cdv.setUint16(8, 0, true);
+    cdv.setUint16(10, 0, true);
+    cdv.setUint16(12, 0, true);
+    cdv.setUint16(14, 0, true);
+    cdv.setUint32(16, crc, true);
+    cdv.setUint32(20, size, true);
+    cdv.setUint32(24, size, true);
+    cdv.setUint16(28, nameBytes.length, true);
+    cdv.setUint16(30, 0, true);
+    cdv.setUint16(32, 0, true);
+    cdv.setUint16(34, 0, true);
+    cdv.setUint16(36, 0, true);
+    cdv.setUint32(38, 0, true);
+    cdv.setUint32(42, offset, true);
+    central.set(nameBytes, 46);
+    centralParts.push(central);
+
+    offset += local.length + data.length;
+  });
+  const centralOffset = offset;
+  const centralSize = centralParts.reduce((s,p)=> s + p.length, 0);
+
+  const end = new Uint8Array(22);
+  const edv = new DataView(end.buffer);
+  edv.setUint32(0, 0x06054b50, true);
+  edv.setUint16(4, 0, true);
+  edv.setUint16(6, 0, true);
+  edv.setUint16(8, files.length, true);
+  edv.setUint16(10, files.length, true);
+  edv.setUint32(12, centralSize, true);
+  edv.setUint32(16, centralOffset, true);
+  edv.setUint16(20, 0, true);
+
+  return new Blob([...localParts, ...centralParts, end], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+
+// ---- 最小限のxlsx(Excel)生成 ----
+function colLetter(n){
+  let s = '', num = n + 1;
+  while(num > 0){
+    const m = (num - 1) % 26;
+    s = String.fromCharCode(65 + m) + s;
+    num = Math.floor((num - 1) / 26);
+  }
+  return s;
+}
+
+function xmlEscape(s){
+  return String(s==null ? '' : s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function sanitizeSheetName(name){
+  return String(name).replace(/[:\\/?*\[\]]/g, '').slice(0, 31) || 'Sheet';
+}
+
+function buildSheetXML(rows){
+  let body = '';
+  rows.forEach((row, ri)=>{
+    body += `<row r="${ri+1}">`;
+    row.forEach((cell, ci)=>{
+      const ref = colLetter(ci) + (ri+1);
+      if(cell.type === 'n'){
+        body += `<c r="${ref}"><v>${cell.v}</v></c>`;
+      } else {
+        body += `<c r="${ref}" t="inlineStr"><is><t xml:space="preserve">${xmlEscape(cell.v)}</t></is></c>`;
+      }
+    });
+    body += `</row>`;
+  });
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>${body}</sheetData></worksheet>`;
+}
+
+function buildWorkbookFiles(sheets){
+  const enc = new TextEncoder();
+  const files = [];
+
+  const contentTypesOverrides = sheets.map((_,i)=>
+    `<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`
+  ).join('');
+  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>${contentTypesOverrides}</Types>`;
+
+  const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
+
+  const sheetEntries = sheets.map((sh,i)=> `<sheet name="${xmlEscape(sh.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('');
+  const workbookXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheetEntries}</sheets></workbook>`;
+
+  const wbRelsEntries = sheets.map((sh,i)=> `<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('');
+  const workbookRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${wbRelsEntries}</Relationships>`;
+
+  files.push({name:'[Content_Types].xml', data: enc.encode(contentTypes)});
+  files.push({name:'_rels/.rels', data: enc.encode(rootRels)});
+  files.push({name:'xl/workbook.xml', data: enc.encode(workbookXml)});
+  files.push({name:'xl/_rels/workbook.xml.rels', data: enc.encode(workbookRels)});
+  sheets.forEach((sh,i)=>{
+    files.push({name:`xl/worksheets/sheet${i+1}.xml`, data: enc.encode(buildSheetXML(sh.rows))});
+  });
+  return files;
+}
+
+function strCell(v){ return {v, type:'s'}; }
+function numCell(v){ return {v, type:'n'}; }
+
+async function buildOrderSummaryWorkbookBlob(){
+  const yearIdx = 3;
+  const yearLabel = YEAR_LABELS[yearIdx] || 'R8';
+
+  // ---- 受注集計 ----
+  const summaryRows = [];
+  for(const s of SCHOOLS){
+    const rec = await storeGet(`rec:${s.id}:1`);
+    if(!rec || !rec.qty) continue;
+    SECTIONS.forEach((sec, si)=>{
+      sec.items.forEach((item, ii)=>{
+        const priceKey = `${si}-${ii}`;
+        let pubName = '';
+        if(item.pubs && item.pubs.length){
+          const selIdx = rec.pubSelect ? rec.pubSelect[priceKey] : null;
+          if(selIdx != null && item.pubs[selIdx] != null) pubName = item.pubs[selIdx];
+        }
+        (item.grades || []).forEach(g=>{
+          const qKey = `${si}-${ii}-${g}-${yearIdx}`;
+          const n = parseInt(rec.qty[qKey], 10);
+          if(!n) return;
+          let gradeLabel;
+          if(item.cycleGrade){
+            const gc = rec.gradeCycle ? rec.gradeCycle[qKey] : '';
+            gradeLabel = gc ? `${gc}年` : '―';
+          } else {
+            gradeLabel = g ? `${g}年` : '―';
+          }
+          summaryRows.push([s.tab || s.name || '', item.subject || '', item.name, pubName, gradeLabel, n]);
+        });
+      });
+    });
+  }
+  summaryRows.sort((a,b)=>
+    a[0].localeCompare(b[0], 'ja') || a[1].localeCompare(b[1], 'ja') ||
+    a[2].localeCompare(b[2], 'ja') || a[4].localeCompare(b[4], 'ja')
+  );
+
+  // ---- 教科ごとのメモ(訪問・営業ログ) ----
+  const memoRowsBySubject = {};
+  SUBJECTS.forEach(sub=> memoRowsBySubject[sub] = []);
+  for(const s of SCHOOLS){
+    for(const sub of SUBJECTS){
+      const mem = await storeGet(`memo:${s.id}:${sub}`);
+      if(!mem || !Array.isArray(mem.entries)) continue;
+      mem.entries.forEach(en=>{
+        if(!en.date && !en.teacher && !en.content) return;
+        memoRowsBySubject[sub].push([s.tab || s.name || '', en.date || '', en.teacher || '', en.content || '']);
+      });
+    }
+  }
+
+  const hasSummary = summaryRows.length > 0;
+  const hasAnyMemo = Object.values(memoRowsBySubject).some(r=> r.length > 0);
+  if(!hasSummary && !hasAnyMemo){
+    return null;
+  }
+
+  const sheets = [];
+  sheets.push({
+    name: sanitizeSheetName(`${yearLabel}年度受注集計`),
+    rows: [
+      ['学校名','教科','教材名','採択','学年','数量'].map(strCell),
+      ...summaryRows.map(r=> [strCell(r[0]), strCell(r[1]), strCell(r[2]), strCell(r[3]), strCell(r[4]), numCell(r[5])])
+    ]
+  });
+  SUBJECTS.forEach(sub=>{
+    sheets.push({
+      name: sanitizeSheetName(`${sub}メモ`),
+      rows: [
+        ['学校名','日付','先生名','内容'].map(strCell),
+        ...memoRowsBySubject[sub].map(r=> r.map(strCell))
+      ]
+    });
+  });
+
+  const blob = buildZip(buildWorkbookFiles(sheets));
+  return { blob, filename: `教材受注集計_${yearLabel}年度.xlsx` };
+}
+
+async function exportOrderSummaryWorkbook(){
+  showToast('集計を作成しています…');
+  const result = await buildOrderSummaryWorkbookBlob();
+  if(!result){
+    showToast('対象データがありません');
+    return;
+  }
+  downloadBlob(result.filename, result.blob);
+  showToast('書き出しました');
+}
+document.getElementById('csvExportBtn').addEventListener('click', exportOrderSummaryWorkbook);
+
+// ---------------- Google Drive連携(Apps Script Web App経由) ----------------
+function blobToBase64(blob){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = ()=> resolve(reader.result.split(',').pop());
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function getDriveConfig(){
+  const cfg = await storeGet('driveConfig');
+  return (cfg && cfg.url && cfg.token) ? cfg : null;
+}
+
+function openDriveConfigDialog(cfg){
+  document.getElementById('driveConfigUrlInput').value = cfg ? cfg.url : '';
+  document.getElementById('driveConfigTokenInput').value = cfg ? cfg.token : '';
+  document.getElementById('driveConfigOverlay').classList.add('open');
+  setTimeout(()=> document.getElementById('driveConfigUrlInput').focus(), 30);
+}
+function closeDriveConfigDialog(){
+  document.getElementById('driveConfigOverlay').classList.remove('open');
+}
+document.getElementById('driveConfigBtn').addEventListener('click', async ()=>{
+  openDriveConfigDialog(await getDriveConfig());
+});
+document.getElementById('driveConfigCancelBtn').addEventListener('click', closeDriveConfigDialog);
+document.getElementById('driveConfigOverlay').addEventListener('click', (e)=>{
+  if(e.target.id === 'driveConfigOverlay') closeDriveConfigDialog();
+});
+document.getElementById('driveConfigSaveBtn').addEventListener('click', async ()=>{
+  const url = document.getElementById('driveConfigUrlInput').value.trim();
+  const token = document.getElementById('driveConfigTokenInput').value.trim();
+  if(!url || !token){
+    showToast('URLとトークンの両方を入力してください');
+    return;
+  }
+  await storeSet('driveConfig', { url, token });
+  closeDriveConfigDialog();
+  showToast('Drive連携設定を保存しました');
+});
+
+async function saveOrderSummaryToDrive(){
+  const cfg = await getDriveConfig();
+  if(!cfg){
+    showToast('先にDrive連携設定を行ってください');
+    openDriveConfigDialog(null);
+    return;
+  }
+  showToast('集計を作成しています…');
+  const result = await buildOrderSummaryWorkbookBlob();
+  if(!result){
+    showToast('対象データがありません');
+    return;
+  }
+  try{
+    showToast('Driveへ送信しています…');
+    const dataBase64 = await blobToBase64(result.blob);
+    const res = await fetch(cfg.url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ token: cfg.token, filename: result.filename, dataBase64 })
+    });
+    const json = await res.json().catch(()=> null);
+    if(json && json.ok){
+      showToast('Driveに保存しました');
+    } else {
+      showToast('Drive保存に失敗しました' + (json && json.error ? (': ' + json.error) : ''));
+    }
+  }catch(err){
+    showToast('Drive保存に失敗しました(通信エラー)');
+  }
+}
+document.getElementById('driveSaveBtn').addEventListener('click', saveOrderSummaryToDrive);
+
+// swipe
+let touchStartX = null, touchStartY = null, touching=false, touchInScrollable=false;
+const viewport = document.getElementById('viewport');
+viewport.addEventListener('touchstart', (e)=>{
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  touching = true;
+  // 表(横スクロール領域)や営業記録内で始まったタッチは、表側の横スクロールに
+  // 専念させ、ページ送りスワイプとして誤検出しないようにする
+  touchInScrollable = !!e.target.closest('.xltable-wrap, textarea');
+}, {passive:true});
+viewport.addEventListener('touchend', (e)=>{
+  if(!touching) return;
+  touching = false;
+  if(touchInScrollable) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if(Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)*1.4){
+    if(dx < 0) goTo(currentIndex+1, true); else goTo(currentIndex-1, true);
+  }
+}, {passive:true});
+
+// ---------------- SCHOOL NAME / CONTACT EDITING ----------------
+schoolNameEl.addEventListener('change', async ()=>{
+  if(IS_ARCHIVE || PAGES.length === 0) return;
+  const si = PAGES[currentIndex].schoolIdx;
+  const s = SCHOOLS[si];
+  const val = schoolNameEl.value.trim();
+  if(!val){ schoolNameEl.value = s.tab; return; }
+  if(val === s.tab) return; // 値に変化がなければ何もしない
+  s.tab = val;
+  s.name = val;
+  await storeSet('schools', SCHOOLS);
+  updateTabLabel(si);
+});
+telInputEl.addEventListener('change', async ()=>{
+  if(IS_ARCHIVE || PAGES.length === 0) return;
+  SCHOOLS[PAGES[currentIndex].schoolIdx].tel = telInputEl.value.trim();
+  await storeSet('schools', SCHOOLS);
+});
+faxInputEl.addEventListener('change', async ()=>{
+  if(IS_ARCHIVE || PAGES.length === 0) return;
+  SCHOOLS[PAGES[currentIndex].schoolIdx].fax = faxInputEl.value.trim();
+  await storeSet('schools', SCHOOLS);
+});
+
+function renderEmptyState(){
+  schoolNameEl.value = '';
+  schoolNameEl.disabled = true;
+  pageKindEl.textContent = '';
+  telInputEl.value = '';
+  faxInputEl.value = '';
+  dotsEl.innerHTML = '';
+  pageTrack.innerHTML = `<div class="section" style="text-align:center;padding:44px 16px;">
+    <p style="font-size:14px;color:var(--ink-soft);margin-bottom:10px;">まだ学校が登録されていません。</p>
+    <p style="font-size:13px;color:var(--ink-soft);">右のタブ下にある「＋」から最初の学校を追加してください。</p>
+  </div>`;
+}
+
+// ---------------- INIT ----------------
+async function init(){
+  if(IS_ARCHIVE) showArchiveBanner();
+  const savedSchools = await storeGet('schools');
+  if(savedSchools && Array.isArray(savedSchools) && savedSchools.length){
+    SCHOOLS.length = 0;
+    savedSchools.forEach(s=> SCHOOLS.push(s));
+    rebuildPages();
+  }
+  buildTabRail();
+  await loadRecordedKeys();
+  const savedYears = await storeGet('yearLabels4');
+  if(savedYears && Array.isArray(savedYears) && savedYears.length === 4) YEAR_LABELS = savedYears;
+  updateCsvYearLabel();
+  if(PAGES.length === 0){
+    renderEmptyState();
+    return;
+  }
+  let startIdx = 0;
+  const last = await storeGet('lastPage');
+  if(typeof last === 'number' && last >=0 && last < PAGES.length) startIdx = last;
+  render(startIdx);
+}
+init();
+
+// ---------------- トップバー高さ連動タブオフセット ----------------
+function syncTabRailOffset(){
+  const topbarEl = document.getElementById('topbar');
+  if(!topbarEl) return;
+  const h = topbarEl.offsetHeight;
+  tabRail.style.paddingTop = (h + 6) + 'px';
+}
+syncTabRailOffset();
+if(window.ResizeObserver){
+  new ResizeObserver(syncTabRailOffset).observe(document.getElementById('topbar'));
+} else {
+  window.addEventListener('resize', syncTabRailOffset);
+}
+
+})();
+</script>
+</body>
+</html>
