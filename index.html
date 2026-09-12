@@ -2187,6 +2187,8 @@ async function buildOrderSummaryData(){
           const selIdx = rec.pubSelect ? rec.pubSelect[priceKey] : null;
           if(selIdx != null && item.pubs[selIdx] != null) pubName = item.pubs[selIdx];
         }
+        const shuninStoreKey = item.shuninKey || priceKey;
+        const shuninName = (rec.shunin && rec.shunin[shuninStoreKey]) || '';
         (item.grades || []).forEach(g=>{
           const qKey = `${si}-${ii}-${g}-${yearIdx}`;
           const n = parseInt(rec.qty[qKey], 10);
@@ -2198,7 +2200,7 @@ async function buildOrderSummaryData(){
           } else {
             gradeLabel = g ? `${g}年` : '―';
           }
-          summaryRows.push([s.tab || s.name || '', item.subject || '', item.name, pubName, gradeLabel, n]);
+          summaryRows.push([s.tab || s.name || '', shuninName, item.name, pubName, gradeLabel, n]);
         });
       });
     });
@@ -2240,7 +2242,7 @@ async function buildOrderSummaryWorkbookBlob(){
   sheets.push({
     name: sanitizeSheetName(`${yearLabel}年度受注集計`),
     rows: [
-      ['学校名','教科','教材名','採択','学年','数量'].map(strCell),
+      ['学校名','主任','教材名','採択','学年','数量'].map(strCell),
       ...summaryRows.map(r=> [strCell(r[0]), strCell(r[1]), strCell(r[2]), strCell(r[3]), strCell(r[4]), numCell(r[5])])
     ]
   });
@@ -2322,7 +2324,7 @@ async function syncOrderSummaryToSheet(){
   sheets.push({
     name: sanitizeSheetName(`${yearLabel}年度受注集計`),
     rows: [
-      ['学校名','教科','教材名','採択','学年','数量'],
+      ['学校名','主任','教材名','採択','学年','数量'],
       ...summaryRows
     ]
   });
