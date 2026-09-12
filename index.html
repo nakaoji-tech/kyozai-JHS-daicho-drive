@@ -497,6 +497,20 @@ body{
   cursor:pointer;
   margin-left:8px;
 }
+#portalBtn{
+  flex:0 0 auto;
+  width:34px;height:34px;
+  border-radius:50%;
+  border:1.5px solid var(--rule);
+  background:var(--card);
+  color:var(--ink);
+  font-size:15px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  margin-left:6px;
+  text-decoration:none;
+}
+#portalBtn:active{background:var(--paper-dark);}
 #deleteSchoolBtn{
   flex:0 0 auto;
   width:34px;height:34px;
@@ -1060,6 +1074,7 @@ body.archive-mode #archiveExportBtn, body.archive-mode #csvExportBtn, body.archi
       <input id="faxInput" class="contact-input" placeholder="FAX 未入力" autocomplete="off">
     </div>
     <button id="searchBtn" aria-label="学校を検索">🔍</button>
+    <a id="portalBtn" href="https://nakaoji-tech.github.io/kyozai-daicho-hub/" aria-label="ポータルへ">🏠</a>
     <button id="deleteSchoolBtn" aria-label="この学校を削除">🗑</button>
   </div>
 </div>
