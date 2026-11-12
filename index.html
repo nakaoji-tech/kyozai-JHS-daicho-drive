@@ -913,7 +913,7 @@ td.shunincell{
   letter-spacing:0.02em;
 }
 body.archive-mode #archiveBanner{display:block;}
-#archiveExportBtn, #csvExportBtn, #driveSaveBtn, #driveConfigBtn{
+#archiveExportBtn, #rolloverBtn, #csvExportBtn, #driveSaveBtn, #driveConfigBtn{
   display:block;
   width:calc(100% - 24px);
   margin:10px 12px 12px;
@@ -1055,7 +1055,7 @@ body.archive-mode .addbtn,
 body.archive-mode .delrow,
 body.archive-mode #deleteSchoolBtn,
 body.archive-mode .tab-add,
-body.archive-mode #archiveExportBtn, body.archive-mode #csvExportBtn, body.archive-mode #driveSaveBtn, body.archive-mode #driveConfigBtn{display:none !important;}
+body.archive-mode #archiveExportBtn, body.archive-mode #rolloverBtn, body.archive-mode #csvExportBtn, body.archive-mode #driveSaveBtn, body.archive-mode #driveConfigBtn{display:none !important;}
 
 ::-webkit-scrollbar{width:0;height:0;}
 </style>
@@ -1087,6 +1087,7 @@ body.archive-mode #archiveExportBtn, body.archive-mode #csvExportBtn, body.archi
     </div>
     <div id="searchResults"></div>
     <button id="archiveExportBtn" type="button">📦 年度アーカイブを書き出す</button>
+    <button id="rolloverBtn" type="button">➡ 新年度へ繰り越す</button>
     <button id="csvExportBtn" type="button">📊 <span id="csvYearLabel">R8</span>年度 受注集計・教科メモをExcel書き出す</button>
     <button id="driveSaveBtn" type="button">📗 スプレッドシートに書き出す</button>
     <button id="driveConfigBtn" type="button">⚙️ Drive連携設定</button>
@@ -1696,6 +1697,7 @@ function scheduleSave(){
   if(IS_ARCHIVE) return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async ()=>{
+    saveTimer = null;
     await storeSet(recordKey(PAGES[currentIndex]), currentData);
     showToast('保存しました');
     refreshBadges();
@@ -2021,6 +2023,94 @@ async function exportArchive(yearName){
   );
   downloadTextFile(`教材受注台帳_中学校_${yearName}_アーカイブ.html`, html);
 }
+
+// ---------------- 新年度へ繰り越し ----------------
+// 全校の受注冊数・学年切替を1列左へずらし(最古年度は消える)、右端を新年度の空欄にする。
+// 在籍人数は1年→2年・2年→3年へ移して1年を空欄に、教師用の冊数は空欄にする。
+function nextYearLabel(label){
+  const m = String(label || '').match(/^(\D*)(\d+)(\D*)$/);
+  return m ? `${m[1]}${parseInt(m[2],10)+1}${m[3]}` : null;
+}
+// キー末尾が年度列(0〜3)のオブジェクトを1列左へずらす
+function shiftYearKeyed(obj){
+  const out = {};
+  Object.keys(obj || {}).forEach(k=>{
+    const m = k.match(/^(\d+-\d+-\d+)-([0-3])$/);
+    if(!m){ out[k] = obj[k]; return; }
+    const y = Number(m[2]);
+    if(y === 0) return;
+    out[`${m[1]}-${y-1}`] = obj[k];
+  });
+  return out;
+}
+let rolloverBusy = false;
+async function rolloverToNewYear(){
+  if(IS_ARCHIVE || rolloverBusy) return;
+  if(SCHOOLS.length === 0){ showToast('学校がまだ登録されていません'); return; }
+  const oldLabels = YEAR_LABELS.slice();
+  const newLabel = nextYearLabel(oldLabels[3]);
+  if(!newLabel){
+    showToast('右端の年度ラベルから次年度を判定できません（例：R8）');
+    return;
+  }
+  closeSearch();
+  const ok = await showConfirm(
+    `${oldLabels[3]} → ${newLabel} に繰り越します。\n\n` +
+    `・全校の受注冊数を1列ずつ左へずらし、${oldLabels[0]}の列は消えます\n` +
+    `・在籍人数は1年→2年、2年→3年へ移し、1年は空欄にします\n` +
+    `・教師用の冊数は空欄にします\n\n` +
+    `${oldLabels[0]}の数字を残したい場合は、キャンセルして先に「年度アーカイブを書き出す」を行ってください。`
+  );
+  if(!ok) return;
+
+  rolloverBusy = true;
+  try{
+    // 入力途中の未保存分を先に保存しておく
+    if(saveTimer && PAGES.length){
+      clearTimeout(saveTimer);
+      saveTimer = null;
+      await storeSet(recordKey(PAGES[currentIndex]), currentData);
+    }
+    const backup = {};
+    for(const s of SCHOOLS){
+      const key = `rec:${s.id}:1`;
+      const rec = await storeGet(key);
+      if(!rec) continue;
+      backup[key] = rec;
+      const enrol = Array.isArray(rec.enrol) && rec.enrol.length === 3 ? rec.enrol : ['','',''];
+      const next = Object.assign({}, rec, {
+        qty: shiftYearKeyed(rec.qty),
+        gradeCycle: shiftYearKeyed(rec.gradeCycle),
+        teacherCount: {},
+        enrol: ['', enrol[0] || '', enrol[1] || '']
+      });
+      await storeSet(key, next);
+    }
+    YEAR_LABELS = [oldLabels[1], oldLabels[2], oldLabels[3], newLabel];
+    await storeSet('yearLabels4', YEAR_LABELS);
+    updateCsvYearLabel();
+    if(PAGES.length) await render(currentIndex);
+    refreshBadges();
+
+    showToast(`${newLabel}年度へ繰り越しました`, {
+      duration: 10000,
+      undo: async ()=>{
+        clearTimeout(saveTimer);
+        saveTimer = null;
+        for(const key of Object.keys(backup)) await storeSet(key, backup[key]);
+        YEAR_LABELS = oldLabels;
+        await storeSet('yearLabels4', YEAR_LABELS);
+        updateCsvYearLabel();
+        if(PAGES.length) await render(currentIndex);
+        refreshBadges();
+        showToast('繰り越しを元に戻しました');
+      }
+    });
+  }finally{
+    rolloverBusy = false;
+  }
+}
+document.getElementById('rolloverBtn').addEventListener('click', rolloverToNewYear);
 
 // ---------------- 受注集計・教科メモ Excel書き出し ----------------
 function updateCsvYearLabel(){
